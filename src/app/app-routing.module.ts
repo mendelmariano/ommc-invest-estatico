@@ -26,9 +26,6 @@ import { canMatchAdminGuard } from './core/guards/can-match-admin.guard';
         children: [
           { path: '', loadChildren: () => import('./pages/components/dashboard/dashboard.module').then(m => m.DashboardModule) },
           { path: 'administrator', loadChildren: () => import('./pages/components/administrator/administrator.module').then(m => m.AdministratorModule), canMatch: [canMatchAdminGuard] },
-          { path: 'teams', loadChildren: () => import('./pages/components/teams/teams.module').then(m => m.TeamsModule) },
-          { path: 'championships', loadChildren: () => import('./pages/components/championships/championships.module').then(m => m.ChampionshipsModule) },
-          { path: 'results', loadChildren: () => import('./pages/components/results/result.module').then(m => m.ResultModule)},
           { path: 'users-settings', loadChildren: () => import('./pages/components/users/users.module').then(m => m.UsersModule) },
         ]
       },

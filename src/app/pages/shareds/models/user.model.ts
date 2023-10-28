@@ -1,4 +1,3 @@
-import { Team } from "./team.interface";
 
 export class User {
     id?:number;

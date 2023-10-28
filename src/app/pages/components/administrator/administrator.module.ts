@@ -23,22 +23,14 @@ import { UserFormComponent } from './user-form/user-form.component';
 import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
 import { CheckboxModule } from 'primeng/checkbox';
 import { PasswordModule } from 'primeng/password';
-import { ModeCrudComponent } from './mode-crud/mode-crud.component';
 import { ToolbarModule } from 'primeng/toolbar';
 import { DialogModule } from 'primeng/dialog';
-import { CheckTeamsComponent } from './teams/check-teams/check-teams.component';
-import { ChampionshipCrudComponent } from './championships/championship-crud/championship-crud.component';
-import { CheckTeamChampionshipComponent } from './championships/check-team-championship/check-team-championship.component';
 
 
 @NgModule({
   declarations: [
     UsersListComponent,
     UserFormComponent,
-    ModeCrudComponent,
-    CheckTeamsComponent,
-    ChampionshipCrudComponent,
-    CheckTeamChampionshipComponent,
 
   ],
   imports: [
