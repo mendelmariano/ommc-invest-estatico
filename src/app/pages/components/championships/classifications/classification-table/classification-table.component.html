@@ -1,0 +1,84 @@
+<div class="grid">
+
+    <div class="col-12">
+
+
+        <div class="card px-6 py-6">
+            <p-toast></p-toast>
+
+            <p-table
+            #dt [value]="dados"
+            [columns]="cols"
+            responsiveLayout="scroll"
+            [rows]="10"
+            [paginator]="true"
+            [rowsPerPageOptions]="[10,20,30]"
+            [showCurrentPageReport]="true"
+            styleClass="p-datatable-striped"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+
+
+            [rowHover]="true"
+            dataKey="id">
+
+            <ng-template pTemplate="caption">
+                <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                    <h5 class="m-0"> {{ championship_name }} </h5>
+
+                </div>
+            </ng-template>
+
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th >Posição </th>
+                    <th pSortableColumn="team">Time </th>
+                    <th pSortableColumn="points"> Pontos </th>
+                    <th pSortableColumn="wins"> Vitórias </th>
+                    <th pSortableColumn="loses"> Empates </th>
+                    <th pSortableColumn="ties"> Derrotas </th>
+                    <th pSortableColumn="goals_pro"> Gols feitos </th>
+                    <th pSortableColumn="goals_conceded"> Gols sofridos </th>
+                    <th pSortableColumn="goals_difference"> Saldo de Gols </th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-team let-i="rowIndex">
+                <tr>
+                    <td><span class="p-column-title">Time</span>
+                        {{ position + i }}º
+                    </td>
+
+                    <td><span class="p-column-title">Time</span>
+                        {{team.team.team}}
+                    </td>
+                    <td><span class="p-column-title">Pontos</span>
+                        {{team.points}}
+                    </td>
+                    <td><span class="p-column-title">Vitórias</span>
+                        {{team.wins}}
+                    </td>
+                    <td><span class="p-column-title">Empates</span>
+                        {{team.ties}}
+                    </td>
+                    <td><span class="p-column-title">Derrotas</span>
+                        {{team.loses}}
+                    </td>
+
+                    <td><span class="p-column-title">Gols pro</span>
+                        {{team.goals_pro}}
+                    </td>
+                    <td><span class="p-column-title">Gols sofridos</span>
+                        {{team.goals_conceded}}
+                    </td>
+
+                    <td><span class="p-column-title">Saldo </span>
+                        {{team.goals_difference}}
+                    </td>
+
+                </tr>
+            </ng-template>
+
+            </p-table>
+    </div>
+</div>

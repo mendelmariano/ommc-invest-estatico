@@ -1,0 +1,52 @@
+<div class="grid">
+
+    <div class="col-12">
+        <div class="card px-6 py-6">
+
+            <p-toast key="tst"></p-toast>
+                <div class="flex flex-column align-items-center justify-content-center">
+
+                    <div style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
+                        <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius:53px">
+                            <div class="text-center mb-5">
+                                <img src="assets/demo/images/login/avatar.png" alt="Image" height="50" class="mb-3">
+                                <div class="text-900 text-3xl font-medium mb-3">Atualização de dados</div>
+                                <span class="text-600 font-medium">Preencha seus dados</span>
+                            </div>
+
+                            <div>
+                                <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+                                <label for="name" class="block text-900 font-medium text-xl mb-2">Nome Completo</label>
+                                <input id="name" formControlName="name"  type="text" placeholder="Digite seu nome completo" pInputText class="w-full md:w-30rem mb-5" style="padding:1rem">
+
+                                <label for="email1" class="block text-900 text-xl font-medium mb-2">Email</label>
+                                <input id="email" formControlName="email" type="text" placeholder="Digite seu email" pInputText class="w-full md:w-30rem mb-5" style="padding:1rem">
+
+                                <label for="whatsapp" class="block text-900 font-medium text-xl mb-2">  Contato <i class="pi pi-whatsapp"></i> </label>
+                                <input id="whatsapp" formControlName="whatsapp"  type="text" placeholder="Digite seu número de contato" pInputText class="w-full md:w-30rem mb-5" style="padding:1rem">
+
+                                <label for="oldPassword" class="block text-900 font-medium text-xl mb-2">Senha atual</label>
+                                <p-password id="oldPassword" formControlName="oldPassword" placeholder="Sua senha" [toggleMask]="true" styleClass="mb-5" inputStyleClass="w-full p-3 md:w-30rem"></p-password>
+
+                                <label for="password" class="block text-900 font-medium text-xl mb-2">Nova Senha</label>
+                                <p-password id="password" formControlName="password" placeholder="Sua senha" [toggleMask]="true" styleClass="mb-5" inputStyleClass="w-full p-3 md:w-30rem"></p-password>
+
+                                <label for="confirmPassword" class="block text-900 font-medium text-xl mb-2">Repita a nova senha</label>
+                                <p-password id="password" formControlName="confirmPassword" placeholder="Repita a senha" [toggleMask]="true" styleClass="mb-5" inputStyleClass="w-full p-3 md:w-30rem"></p-password>
+
+                                <div class="flex align-items-center justify-content-between mb-5 gap-5">
+
+                                </div>
+
+
+                                <button [disabled]="userForm.invalid" pButton pRipple label="Atualizar" class="w-full p-3 text-xl mb-2"></button> <br>
+                                <button pButton pRipple label="Voltar" class="p-button-secondary w-full p-3 text-xl mt-2" [routerLink]="['/']"></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+        </div>
+     </div>
+</div>

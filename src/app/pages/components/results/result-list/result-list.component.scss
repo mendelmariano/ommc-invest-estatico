@@ -1,0 +1,40 @@
+.link {
+    cursor: pointer;
+}
+
+/* Estilos personalizados para o diálogo */
+.p-dialog-custom {
+
+
+    padding: 20px; /* Espaçamento interno para melhorar a aparência */
+  }
+
+  /* Estilos personalizados para a tabela */
+  .custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+  }
+
+  .custom-table th,
+  .custom-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+  }
+
+  .custom-table th {
+    background-color: #f2f2f2;
+  }
+
+  /* Estilos para o motivo de recusa */
+  .p-col-12 p {
+    margin: 10px 0;
+    font-weight: bold; /* Destaca o motivo com negrito */
+    color: #ff5733; /* Cor laranja para destaque */
+    font-size: 18px; /* Tamanho de fonte maior para ênfase */
+    text-align: center; /* Centraliza o texto horizontalmente */
+    border: 2px solid #ff5733; /* Adiciona uma borda ao redor do motivo */
+    padding: 10px; /* Espaçamento interno para destacar o motivo */
+    border-radius: 5px; /* Bordas arredondadas para destacar */
+  }

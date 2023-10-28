@@ -1,0 +1,90 @@
+<div class="card">
+    <p-toast></p-toast>
+
+
+        <div class="stepsdemo-content">
+            <p-card>
+                <ng-template pTemplate="title">
+                    Registro de Partida
+                </ng-template>
+                <ng-template pTemplate="subtitle">
+                    Cadastre o resultado do seu jogo e aguarde confirmação do adversário para atualização do ranking
+                </ng-template>
+                <ng-template pTemplate="content">
+
+                    <form [formGroup]="matchForm" (ngSubmit)="onSubmit()">
+                        <div class="card p-fluid">
+                            <h5>Poste o placar informando também o campeonato que foi feito a partida</h5>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="field col">
+                                    <label for="dropdown">Jogo válido pelo campeonato </label>
+                                    <p-dropdown
+                                        inputId="championship_id"
+                                        formControlName="championship"
+                                        [autoDisplayFirst]="false"
+                                        [options]="championships"
+                                        optionLabel="name"
+                                        (onChange)="loadTeamsMatch($event)"
+                                       >
+                                    </p-dropdown>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-formgrid grid">
+
+                            <div class="field col">
+                                <label for="dropdown">Meu time </label>
+                                <p-dropdown
+                                    inputId="home_team"
+                                    formControlName="home_team"
+                                    [autoDisplayFirst]="false"
+                                    [options]="home_teams"
+                                    optionLabel="team"
+
+                                   >
+                                </p-dropdown>
+                            </div>
+
+                            <div class="field col">
+                                <label htmlFor="home_goals" > Gols feitos </label>
+                                <input pInputText formControlName="home_goals" id="home_goals" type="number" class="p-inputtext p-component" />
+                            </div>
+
+                            <div class="col-md-1 align-self-center text-center">
+
+                               <h3> x </h3>
+                            </div>
+
+                            <div class="field col">
+                                <label htmlFor="away_goals"> Gols sofridos </label>
+                                <input pInputText formControlName="away_goals" id="away_goals" type="number" class="p-inputtext p-component"  />
+                            </div>
+
+
+                            <div class="field col">
+                                <label for="dropdown">Adversário</label>
+                                <p-dropdown
+                                    inputId="away_team"
+                                    formControlName="away_team"
+                                    [autoDisplayFirst]="false"
+                                    [options]="away_teams"
+                                    optionLabel="team"
+                                   >
+                                </p-dropdown>
+                            </div>
+
+
+                            <div class="field col mt-auto">
+
+                                <button  [disabled]="matchForm.invalid" pButton class="align-self-end" label="Postar Resultado"></button>
+                            </div>
+                        </div>
+                    </div>
+                    </form>
+
+
+                </ng-template>
+            </p-card>
+        </div>
+</div>

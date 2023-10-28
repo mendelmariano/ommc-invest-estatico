@@ -1,0 +1,33 @@
+
+    <div class="flex flex-column align-items-center justify-content-center">
+
+        <div style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
+            <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius:53px">
+
+
+                <div>
+                    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+                    <label for="name" class="block text-900 font-medium text-xl mb-2">Nome Completo</label>
+                    <input id="name" formControlName="name"  type="text" placeholder="Digite seu nome completo" pInputText class="w-full md:w-30rem mb-5" style="padding:1rem">
+
+                    <label for="email1" class="block text-900 text-xl font-medium mb-2">Email</label>
+                    <input id="email" formControlName="email" type="text" placeholder="Digite seu email" pInputText class="w-full md:w-30rem mb-5" style="padding:1rem">
+
+                    <label for="password" class="block text-900 font-medium text-xl mb-2">Senha</label>
+                    <p-password id="password" formControlName="password" placeholder="Sua senha" styleClass="mb-5" inputStyleClass="w-full p-3 md:w-30rem"></p-password>
+
+                    <label for="perfil_id" class="block text-900 font-medium text-xl mb-2">Perfil</label>
+                    <p-dropdown [options]="profile" optionValue="id" optionLabel="name" formControlName="profile_id">
+                    </p-dropdown>
+                    <div class="flex align-items-center justify-content-between mb-5 gap-5">
+
+                    </div>
+
+
+                    <button [disabled]="userForm.invalid" pButton pRipple label="Salvar" class="w-full p-3 text-xl mb-2"></button> <br>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+

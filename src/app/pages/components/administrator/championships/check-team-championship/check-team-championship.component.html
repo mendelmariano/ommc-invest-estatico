@@ -1,0 +1,92 @@
+<div class="grid">
+
+    <div class="col-12">
+        <div class="card">
+            <h5>Times para liberar o acesso nos campeonatos</h5>
+			<p-toast></p-toast>
+
+
+            <p-table
+                #dt1
+                [value]="championships"
+                dataKey="id"
+                [rows]="10"
+                [loading]=""
+                [rowHover]="true"
+                styleClass="p-datatable-gridlines"
+                [paginator]="true"
+                [globalFilterFields]="['championship.name','team.team']"
+                responsiveLayout="scroll">
+
+                <ng-template pTemplate="caption">
+					<div class="flex justify-content-between flex-column sm:flex-row">
+						<span class="p-input-icon-left mb-2">
+							<i class="pi pi-search"></i>
+							<input pInputText type="text" #filter (input)="onGlobalFilter(dt1, $event)" placeholder="Search Keyword" class="w-full"/>
+						</span>
+					</div>
+				</ng-template>
+
+                <ng-template pTemplate="header">
+
+                    <tr>
+                        <th>
+                            <div class="flex justify-content-between align-items-center">
+								Campeonato
+							</div>
+                        </th>
+
+                        <th>
+                            <div class="flex justify-content-between align-items-center">
+								Time
+							</div>
+                        </th>
+
+                        <th>
+                            <div class="flex justify-content-between align-items-center">
+								Liberar
+							</div>
+                        </th>
+
+
+
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-championship>
+                    <tr>
+
+                        <td>
+                            {{ championship.championship.name }}
+                        </td>
+
+                        <td>
+                            {{ championship.team.team }}
+                        </td>
+
+                        <td>
+                            <button pButton pRipple type="button" label="Liberar" (click)="activeTeam(championship)" class="p-button-success"></button>
+                        </td>
+
+
+                    </tr>
+
+                </ng-template>
+            </p-table>
+
+        </div>
+
+        <p-dialog [(visible)]="activeChampionshipDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <span *ngIf="championship">Deseja liberar este time para participar? <b>{{championship.championship.name}}</b>?</span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="activeChampionshipDialog = false"></button>
+                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes" (click)="confirmActiveTeam()"></button>
+            </ng-template>
+        </p-dialog>
+
+    </div>
+
+</div>

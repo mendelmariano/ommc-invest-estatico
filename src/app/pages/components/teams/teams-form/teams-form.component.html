@@ -1,0 +1,47 @@
+<div class="card">
+    <p-toast></p-toast>
+
+
+        <div class="stepsdemo-content">
+            <p-card>
+                <ng-template pTemplate="title">
+                    Cadastre seu time
+                </ng-template>
+                <ng-template pTemplate="subtitle">
+                    Cadastre seu time, informando se ele será um time do modo ultimate ou clubs
+                </ng-template>
+                <ng-template pTemplate="content">
+
+                    <form [formGroup]="teamForm" (ngSubmit)="onSubmit()">
+                    <div class="card p-fluid">
+                        <h5>Cadastre seu time e modo de jogo</h5>
+                        <div class="p-formgrid grid">
+                            <div class="field col">
+                                <label htmlFor="name" >Nome do time</label>
+                                <input pInputText formControlName="name" id="name" type="text" />
+                            </div>
+                            <div class="field col">
+                                <label for="dropdown">Modo de jogo</label>
+                                <p-dropdown
+                                    inputId="mode"
+                                    formControlName="mode"
+                                    [autoDisplayFirst]="false"
+                                    [options]="modes"
+                                    optionLabel="name"
+                                   >
+                                </p-dropdown>
+                            </div>
+
+                            <div class="field col mt-auto">
+
+                                <button  [disabled]="teamForm.invalid" pButton class="align-self-end" label="Cadastrar"></button>
+                            </div>
+                        </div>
+                    </div>
+                    </form>
+
+
+                </ng-template>
+            </p-card>
+        </div>
+</div>

@@ -1,0 +1,131 @@
+<div class="grid">
+
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <p-toast></p-toast>
+
+
+
+            <p-table
+                #dt [value]="championships"
+                [columns]="cols"
+                responsiveLayout="scroll"
+                [rows]="10"
+                [globalFilterFields]="['name',  'mode.name']"
+                [paginator]="true"
+                [rowsPerPageOptions]="[10,20,30]"
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                [(selection)]="selectedChampionships"
+                selectionChampionship="multiple"
+                [rowHover]="true"
+                dataKey="id">
+
+                <ng-template pTemplate="caption">
+                    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        <h5 class="m-0">Campeonatos cadastrados</h5>
+                        <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."  class="w-full sm:w-auto"/>
+                        </span>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate="header">
+                    <tr>
+
+                        <th pSortableColumn="id">id <p-sortIcon field="id"></p-sortIcon></th>
+                        <th pSortableColumn="name"> Campeonato <p-sortIcon field="name"></p-sortIcon></th>
+                        <th pSortableColumn="mode"> Modo de Jogo <p-sortIcon field="name"></p-sortIcon></th>
+
+                        <th> Participar </th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-championship>
+                    <tr>
+                        <td><span class="p-column-title">Id</span>
+                            {{championship.id}}
+                        </td>
+                        <td style="width:14%; min-width:10rem;">
+                            <span class="p-column-title">Name</span>
+                            {{championship.name}}
+                        </td>
+
+
+                        <td style="width:20%; min-width:10rem;">
+                            <span class="p-column-title">Modo de jogo </span>
+                            {{championship.mode.name}}
+                        </td>
+
+                        <td>
+                            <div class="flex">
+                                <button pButton pRipple class="p-button-rounded p-button-warning mr-2" (click)="participeChampionship(championship)" [disabled]="userIsInClassification(championship.id)"> Participar </button>
+
+                            </div>
+                        </td>
+
+                    </tr>
+
+                </ng-template>
+            </p-table>
+
+        </div>
+
+
+        <p-dialog [(visible)]="championshipDialog" [style]="{width: '450px', height: '450px'}" header="Campeonato" [modal]="true" class="p-fluid">
+
+            <ng-template pTemplate="content">
+
+                <div class="field">
+                    <label for="name">Name</label>
+                    <input type="text" pInputText id="name" [(ngModel)]="championship.name" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !championship.name}"/>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !championship.name=='' ">Preencha o nome.</small>
+                </div>
+
+                <div class="field">
+                    <label for="status">Modo de jogo</label>
+                    <p-dropdown [options]="modes" optionLabel="name" [(ngModel)]="championship.mode"></p-dropdown>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+                <button pButton pRipple [disabled]="!championship.name" label="Save" icon="pi pi-check" class="p-button-text" (click)="saveChampionship()"></button>
+            </ng-template>
+        </p-dialog>
+
+
+        <p-dialog [(visible)]="participeChampionshipDialog" [style]="{width: '450px', height: '450px'}" header="Escolha a equipe" [modal]="true" >
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <span *ngIf="championship">Deseja realmente se inscrever neste campeonato? <b>{{championship.name}}</b>?</span>
+            </div>
+
+            <div class="field mt-4 flex align-items-center justify-content-center">
+                <label for="status">Selecione o time </label>
+			    <p-dropdown class="ml-2" [options]="teams" [(ngModel)]="teamSelected" optionLabel="team" placeholder="Selecione a equipe" [showClear]="true">
+
+                </p-dropdown>
+            </div>
+
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="participeChampionshipDialog = false"></button>
+                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes" (click)="confirmParticipation()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="deleteChampionshipsDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <span>Tem certeza que qur excluir estes modos?</span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="deleteChampionshipsDialog = false"></button>
+                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes" (click)="confirmDeleteSelected()"></button>
+            </ng-template>
+        </p-dialog>
+
+    </div>
+
+</div>

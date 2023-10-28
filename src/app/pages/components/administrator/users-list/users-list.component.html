@@ -1,0 +1,116 @@
+<p-toast key="tst"></p-toast>
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <h5>Usuários cadastrados</h5>
+            <p-table
+            #dt1
+            dataKey="id"
+            [rows]="usersList?.users?.length"
+            [first]="(currentPage - 1) * pageSize"
+            [value]="usersList?.users"
+            styleClass="p-datatable-gridlines"
+            [paginator]="false"
+            [totalRecords]="usersList?.totalCount"
+            [rowsPerPageOptions]="[10, 20, 50]"
+            [pageLinks]="3"
+            [globalFilterFields]="['name', 'email', 'profile.name']"
+            responsiveLayout="scroll">
+
+                <ng-template pTemplate="caption">
+                    <div class="flex justify-content-end flex-column sm:flex-row">
+
+                        <span class="p-input-icon-left mb-2">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" #filterElement (input)="onGlobalFilter($event)" placeholder="Buscar usuário" class="w-full"/>
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="min-width: 12rem">
+                            <div class="flex justify-content-between align-items-center">
+                                Nome
+
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div class="flex justify-content-between align-items-center">
+                                Email
+
+                            </div>
+                        </th>
+
+                        <th style="min-width: 12rem">
+                            <div class="flex justify-content-between align-items-center">
+                                Perfil
+
+                            </div>
+                        </th>
+
+                        <th>
+                            <div class="flex justify-content-between align-items-center">
+                                Editar
+                            </div>
+                        </th>
+
+                        <th>
+                            <div class="flex justify-content-between align-items-center">
+                                Apagar
+                            </div>
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-user>
+                    <tr>
+                        <td>
+                            {{ user.name }}
+                        </td>
+                        <td>
+                            {{ user.email }}
+                        </td>
+
+                        <td>
+                            {{ user.profile.name }}
+                        </td>
+
+                        <td>
+                            <button  (click)="editUser(user)" pButton pRipple type="button" icon="pi pi-user-edit" class="p-button-rounded p-button-info"></button>
+                        </td>
+
+                        <td>
+                            <button  (click)="deleteUser(user)" pButton pRipple type="button" icon="pi pi-times" class="p-button-rounded p-button-danger"></button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+
+            <p-paginator
+                [totalRecords]="usersList?.totalCount"
+                [rows]="pageSize"
+                [first]="(currentPage - 1) * pageSize"
+                (onPageChange)="onPageChange($event)"
+                >
+            </p-paginator>
+
+            <ng-template #customPaginatorTemplate let-paginator>
+                <div class="p-paginator">
+                    <span class="p-paginator-current-page">Página {{ paginator.getPage() }} de {{ paginator.getPageCount() }}</span>
+                    <button pButton type="button" icon="pi pi-angle-left" (click)="previousPage()" [disabled]="paginator.getPage() === 1"></button>
+                    <button pButton type="button" icon="pi pi-angle-right" (click)="nextPage()" [disabled]="paginator.getPage() === paginator.getPageCount()"></button>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+
+    <p-dialog [(visible)]="deleteUserDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+        <div class="flex align-items-center justify-content-center">
+            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+            <span *ngIf="userSelected">Tem certeza que quer excluir este usuário? <b>{{userSelected.name}}</b>?</span>
+        </div>
+        <ng-template pTemplate="footer">
+            <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="deleteUserDialog = false"></button>
+            <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes" (click)="confirmDelete()"></button>
+        </ng-template>
+    </p-dialog>
+</div>

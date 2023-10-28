@@ -1,0 +1,30 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <p-toast key="tst"></p-toast>
+            <div class="flex flex-column align-items-center justify-content-center">
+                <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
+                    <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
+                        <div class="text-center mb-5">
+                            <img src="assets/demo/images/login/avatar.png" alt="Image" height="100" class="mb-3 rounded-circle">
+                            <div class="text-900 text-3xl font-medium mb-3">{{ loggedInUser?.name }}</div>
+                            <div class="text-600 font-medium">{{ loggedInUser?.email }}</div>
+                            <div class="text-600 font-medium">{{ loggedInUser?.whatsapp }}</div>
+                            <div class="text-600 font-medium">{{ loggedInUser?.profile?.name }}</div>
+                            <!-- Botão de Editar Perfil com estilo melhorado -->
+                            <button
+                                    pButton
+                                    pRipple type="button"
+                                     icon="pi pi-pencil"
+                                     label=" Editar Perfil"
+                                     class="btn btn-primary mt-3"
+                                     [routerLink]="['/users-settings/edit']">
+
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

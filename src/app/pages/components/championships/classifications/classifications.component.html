@@ -1,0 +1,8 @@
+<h3> Classificação </h3>
+
+<div *ngFor="let ranking of rankingsTables">
+
+    <app-classification-table [dados]="ranking" [championship_name]="ranking[0].championship.name" > </app-classification-table>
+
+
+</div>
