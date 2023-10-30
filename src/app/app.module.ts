@@ -13,6 +13,11 @@ import { NodeService } from './pages/service/node.service';
 import { PhotoService } from './pages/service/photo.service';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AngularFireModule } from '@angular/fire/compat';
+import { environment } from 'src/environments/environment';
+import { provideFirebaseApp, getApp, initializeApp } from '@angular/fire/app';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+
 
 @NgModule({
     declarations: [
@@ -20,7 +25,10 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
     ],
     imports: [
         AppRoutingModule,
-        AppLayoutModule
+        AppLayoutModule,
+        provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
+        provideFirestore(() => getFirestore()),
+        AngularFireModule.initializeApp(environment.firebaseConfig),
     ],
     providers: [
         { provide: LocationStrategy, useClass: HashLocationStrategy },

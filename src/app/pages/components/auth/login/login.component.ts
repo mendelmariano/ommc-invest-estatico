@@ -8,6 +8,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthServiceService } from '../auth-service.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UserResponseLogin } from 'src/app/pages/shareds/interfaces/userLogin.interface';
+import { GoogleAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
 
 @Component({
     selector: 'app-login',
@@ -68,6 +69,10 @@ export class LoginComponent {
                   }
               )
             }
+          }
+
+          loginGoogle() {
+            this.authService.loginGoogle();
           }
 
 }
