@@ -77,20 +77,17 @@ export class UsersSettingsFormComponent implements OnInit {
 
 
       onSubmit() {
-        console.log('Dados preenchidos: ', this.userForm.value);
         if (this.userForm.valid) { // O formulário é válido, você pode continuar com o envio dos dados.
           const { name, email, whatsapp, password, confirmPassword, oldPassword, ...user } = this.userForm.value;
 
 
           const userUpdate: UserUpdate = { name, email, password, whatsapp, confirmPassword, oldPassword };
 
-          if(!userUpdate.oldPassword) {
+         /*  if(!userUpdate.oldPassword) {
             delete userUpdate.password;
             delete userUpdate.oldPassword;
             delete userUpdate.confirmPassword;
-          }
-
-          console.log('User usp', userUpdate);
+          } */
 
           this.userService.update(userUpdate).subscribe({
             next: (response: User) => {

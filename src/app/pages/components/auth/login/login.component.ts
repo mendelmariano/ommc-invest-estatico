@@ -8,7 +8,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthServiceService } from '../auth-service.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UserResponseLogin } from 'src/app/pages/shareds/interfaces/userLogin.interface';
-import { GoogleAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
+import { OAuthCredential } from 'firebase/auth';
 
 @Component({
     selector: 'app-login',
@@ -72,7 +72,38 @@ export class LoginComponent {
           }
 
           loginGoogle() {
-            this.authService.loginGoogle();
+            this.authService.loginGoogle().subscribe(
+              (idToken: string) => {
+                this.validatorLoginGoogle(idToken);
+              },
+              (error: HttpErrorResponse) => {
+                // Lida com erros, como validação de campos ou falhas na API
+                this.messageService.add({ key: 'tst', severity: 'error', summary: 'Falhou!', detail: `Erro! ${error.error.error}` });
+                // Exiba mensagens de erro ou realize ações apropriadas
+              }
+            );
           }
+
+          validatorLoginGoogle(idToken: string) {
+            this.authService.loginGoogleToken(idToken).subscribe(
+              (response: UserResponseLogin) => {
+                // Lida com a resposta da API após o cadastro bem-sucedido
+                if (response) {
+                  this.messageService.add({ key: 'tst', severity: 'success', summary: 'Sucesso!', detail: 'Login executado com sucesso!' });
+                  if (response.token) {
+                    this.router.navigate(['/']); // Redirecione para o dashboard após o login
+                  }
+                }
+                // Você pode redirecionar o usuário para outra página ou realizar outras ações aqui
+              },
+              (error: HttpErrorResponse) => {
+                // Lida com erros, como validação de campos ou falhas na API
+                this.messageService.add({ key: 'tst', severity: 'error', summary: 'Falhou!', detail: `Erro! ${error.error.error}` });
+                // Exiba mensagens de erro ou realize ações apropriadas
+              }
+            );
+          }
+
+
 
 }

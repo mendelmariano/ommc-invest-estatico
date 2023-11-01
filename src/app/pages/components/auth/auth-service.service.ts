@@ -1,16 +1,19 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, from, map, of, tap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, from, map, of, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { User } from '../../shareds/models/user.model';
 import jwt_decode from 'jwt-decode';
 import { UserRequestLogin, UserResponseLogin } from '../../shareds/interfaces/userLogin.interface';
-import { TokenResponse } from '../../shareds/models/token.interface';
+import { TokenResponse, TokenResponseGoogle } from '../../shareds/models/token.interface';
 const KEY = 'authToken';
 
 import 'firebase/auth';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider, UserCredential, getAuth, signInWithPopup } from "firebase/auth";
+import { UserCredentialImp } from '../../shareds/interfaces/UserCredentialImp.interface';
+import { UserUpdate } from '../../shareds/models/user.interface';
+import { UsersService } from '../users/users.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +23,7 @@ export class AuthServiceService {
     private tokenSubject: BehaviorSubject<string | null>;
     private userSubject = new BehaviorSubject<User>(null);
 
-    constructor(private http: HttpClient, private afAuth: AngularFireAuth) {
+    constructor(private http: HttpClient, private afAuth: AngularFireAuth, private userService: UsersService) {
         this.tokenSubject = new BehaviorSubject<string | null>(localStorage.getItem('authToken'));
     }
 
@@ -38,16 +41,37 @@ export class AuthServiceService {
 
       private decodeAndNotify() {
         const token = this.getToken();
-        const tokenDecodificado: TokenResponse = jwt_decode(token);
+        let tokenDecodificado: TokenResponseGoogle | TokenResponse;
 
-        const user: User = {
-            name: tokenDecodificado.user.name,
-            profile_id: tokenDecodificado.user.profile_id,
-            email: tokenDecodificado.user.email,
-            id: tokenDecodificado.user.id,
-            whatsapp: tokenDecodificado.user.whatsapp,
+        try {
+            tokenDecodificado = jwt_decode(token);
+        } catch (error) {
+            console.error('Erro ao decodificar token:', error);
+            return;
         }
-        this.userSubject.next(user);
+
+        if('aud' in tokenDecodificado){
+            const user: User = {
+                name: tokenDecodificado.name,
+                profile_id: 1,
+                email: tokenDecodificado.email,
+                id: tokenDecodificado.user_id,
+                whatsapp: 'não informado',
+            }
+            this.userSubject.next(user);
+
+
+        } else {
+            const user: User = {
+                name: tokenDecodificado.user.name,
+                profile_id: tokenDecodificado.user.profile_id,
+                email: tokenDecodificado.user.email,
+                id: tokenDecodificado.user.id,
+                whatsapp: tokenDecodificado.user.whatsapp,
+            }
+            this.userSubject.next(user);
+        }
+
       }
 
     cadastrarUsuario(usuario: User): Observable<any> {
@@ -72,33 +96,66 @@ export class AuthServiceService {
     }
 
 
-      loginGoogle(): void {
+    loginGoogle(): Observable<string> {
         const provider = new GoogleAuthProvider();
         const auth = getAuth();
-        signInWithPopup(auth, provider)
-            .then((result) => {
-                console.log('Resultado: ', result);
+
+        return from(signInWithPopup(auth, provider)).pipe(
+            map((userCredentialImpl: any) => {
                 // This gives you a Google Access Token. You can use it to access the Google API.
-                const credential = GoogleAuthProvider.credentialFromResult(result);
-                console.log('Credentials: ', credential);
-                const token = credential.accessToken;
-                // The signed-in user info.
-                const user = result.user;
+                // const credential = GoogleAuthProvider.credentialFromResult(userCredentialImpl);
+                const token = userCredentialImpl.user.accessToken;
 
-                // IdP data available using getAdditionalUserInfo(result)
-                // ...
-            }).catch((error) => {
-                // Handle Errors here.
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                // The email of the user's account used.
-                const email = error.customData.email;
-                // The AuthCredential type that was used.
+                // You can include your logic here to handle the token and user data
+                if (token) {
+                    this.updateUserDate(userCredentialImpl.user);
+                }
+
+                // Return the user data or an appropriate response
+                // Adjust this part to return the user data as needed
+                return token;
+            }),
+            catchError((error) => {
                 const credential = GoogleAuthProvider.credentialFromError(error);
+                console.log('Erro: ', credential);
+                // Handle the error or return an appropriate error response
+                // Adjust this part as needed
+                throw new Error('Google login error');
+            })
+        );
+    }
 
-                // ...
-            });
+    async updateUserDate(u: any ) {
+        try {
+          const newUser: UserUpdate = {
+            uuid: u.uid,
+            email: u.email,
+            name: u.displayName,
+          }
+          await this.userService.updateGoogle(newUser, u.uid).subscribe()
+
+          return
+        } catch(e) {
+          throw new Error(e);
+        }
       }
+
+    loginGoogleToken(idToken: string) {
+        return this.http.get(`${this.apiUrl}sessions/google/${idToken}`)
+        .pipe(
+            map(
+                (response : UserResponseLogin ) => {
+                    const token = response.token;
+                    if (token) {
+                        localStorage.setItem(KEY, token); // Armazene o token no localStorage
+                        this.tokenSubject.next(token); // Atualize o BehaviorSubject
+                        this.decodeAndNotify();
+                      }
+                      return response;
+                  }
+            )
+        )
+    }
 
     logout(): void {
         localStorage.removeItem('authToken'); // Remova o token do localStorage

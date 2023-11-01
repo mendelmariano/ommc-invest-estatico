@@ -9,5 +9,6 @@ export interface UserResponseLogin {
         name: string,
         email: string,
     },
-    token: string
+    token: string;
+    accessToken?: string;
 }
