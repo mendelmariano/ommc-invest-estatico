@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DashboardComponent } from './dashboard.component';
 import { ChartModule } from 'primeng/chart';
 import { MenuModule } from 'primeng/menu';
@@ -9,6 +9,19 @@ import { ButtonModule } from 'primeng/button';
 import { StyleClassModule } from 'primeng/styleclass';
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { DashboardsRoutingModule } from './dashboard-routing.module';
+import { SpeedDialModule } from 'primeng/speeddial';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { SplitButtonModule } from 'primeng/splitbutton';
+import { ToolbarModule } from 'primeng/toolbar';
+import { SidebarModule } from 'primeng/sidebar';
+import { CalendarModule } from 'primeng/calendar';
+import { InputMaskModule } from 'primeng/inputmask';
+import { InputTextModule } from 'primeng/inputtext';
+import { RippleModule } from 'primeng/ripple';
+import { FieldsetModule } from 'primeng/fieldset';
+import { EntriesModule } from '../entries/entries.module';
+import { OutsModule } from '../outs/outs.module';
 
 @NgModule({
     imports: [
@@ -20,8 +33,22 @@ import { DashboardsRoutingModule } from './dashboard-routing.module';
         StyleClassModule,
         PanelMenuModule,
         ButtonModule,
-        DashboardsRoutingModule
+        RippleModule,
+        DashboardsRoutingModule,
+        SpeedDialModule,
+        ToastModule,
+        SplitButtonModule,
+        ToolbarModule,
+        SidebarModule,
+        ReactiveFormsModule,
+        CalendarModule,
+        InputMaskModule,
+        InputTextModule,
+        FieldsetModule,
+        EntriesModule,
+        OutsModule,
     ],
-    declarations: [DashboardComponent]
+    declarations: [DashboardComponent],
+    providers: [MessageService]
 })
 export class DashboardModule { }

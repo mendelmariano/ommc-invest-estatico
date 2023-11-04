@@ -1,103 +1,162 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MenuItem } from 'primeng/api';
-import { Product } from '../../api/product';
-import { ProductService } from '../../service/product.service';
-import { Subscription } from 'rxjs';
+import { MenuItem, MessageService } from 'primeng/api';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Plan } from '../../shareds/models/plan.model';
+import { Entry } from '../../api/entry';
+import { Out } from '../../api/out';
 
 @Component({
-    templateUrl: './dashboard.component.html',
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
 
-    items!: MenuItem[];
+    items: MenuItem[] | undefined;
+    visiblePeriodPlan: boolean = false;
+    visibleInOut: boolean = false;
+    planForm: FormGroup;
+    plan: Plan = new Plan();
+    pieDataGeneral: any;
+    pieOptionsGeneral: any;
 
-    products!: Product[];
+    totalEntries: number = 0;
+    entries: Entry[] = [];
 
-    chartData: any;
+    totalOuts: number = 0;
+    outs: Out[] = [];
 
-    chartOptions: any;
-
-    subscription!: Subscription;
-
-    constructor(private productService: ProductService, public layoutService: LayoutService) {
-        this.subscription = this.layoutService.configUpdate$.subscribe(() => {
-            this.initChart();
+    constructor(private messageService: MessageService,
+                public layoutService: LayoutService,
+                private fb: FormBuilder) {
+        this.planForm = this.fb.group({
+            dataInicio: ['', Validators.required],
+            dataFim: ['', Validators.required],
+            namePlan: ['', Validators.required],
         });
+
+        this.mockDatas();
+
+
+    }
+    ngOnDestroy(): void {
+        throw new Error('Method not implemented.');
     }
 
     ngOnInit() {
-        this.initChart();
-        this.productService.getProductsSmall().then(data => this.products = data);
+        this.initMenuNew();
+        this.updatePieChart();
+    }
 
+    mockDatas() {
+        // Valores mockados
+        const mockValues = {
+            dataInicio: "2023-11-01T03:00:00.000Z",
+            dataFim: "2023-11-30T03:00:00.000Z",
+            namePlan: "Novembro/2024"
+        };
+
+        // Use o método patchValue para definir os valores iniciais
+        this.planForm.patchValue(mockValues);
+        this.salvarPeriodo();
+        this.updatePieChart();
+    }
+
+    onTotalEntriesChanged(total: number) {
+        this.totalEntries = total;
+        this.updatePieChart();
+    }
+
+    onEntriesChanged(entries: Entry[]) {
+        this.entries = entries;
+        this.updatePieChart();
+    }
+
+    onTotalOutsChanged(total: number) {
+        this.totalOuts = total;
+        this.updatePieChart();
+    }
+
+    onOutsChanged(outs: Out[]) {
+        this.outs = outs;
+        this.updatePieChart();
+    }
+
+    initMenuNew() {
         this.items = [
-            { label: 'Add New', icon: 'pi pi-fw pi-plus' },
-            { label: 'Remove', icon: 'pi pi-fw pi-minus' }
+            {
+                icon: 'one',
+                label: 'Selecionar período',
+                command: () => {
+                    this.messageService.add({ severity: 'info', summary: 'Add', detail: 'Data Added' });
+                    this.visiblePeriodPlan = true;
+                }
+            },
+            {
+                icon: 'salvar',
+                command: () => {
+                    this.messageService.add({ severity: 'success', summary: 'Update', detail: 'Data Updated' });
+                }
+            },
         ];
     }
 
-    initChart() {
+
+
+    updatePieChart() {
         const documentStyle = getComputedStyle(document.documentElement);
         const textColor = documentStyle.getPropertyValue('--text-color');
         const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
         const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
 
-        this.chartData = {
-            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+
+        this.pieDataGeneral = {
+            labels: ['Receitas', 'Gastos'],
             datasets: [
                 {
-                    label: 'First Dataset',
-                    data: [65, 59, 80, 81, 56, 55, 40],
-                    fill: false,
-                    backgroundColor: documentStyle.getPropertyValue('--bluegray-700'),
-                    borderColor: documentStyle.getPropertyValue('--bluegray-700'),
-                    tension: .4
-                },
-                {
-                    label: 'Second Dataset',
-                    data: [28, 48, 40, 19, 86, 27, 90],
-                    fill: false,
-                    backgroundColor: documentStyle.getPropertyValue('--green-600'),
-                    borderColor: documentStyle.getPropertyValue('--green-600'),
-                    tension: .4
+                    label: 'Situação mensal',
+                    data: [this.totalEntries, this.totalOuts],
+                    backgroundColor: [ 'rgba(75, 192, 192, 0.2)', 'rgba(255, 50, 0, 0.2)'],
+                    borderColor: ['rgb(255, 159, 64)', 'rgb(75, 192, 192)'],
+                    borderWidth: 1
                 }
             ]
         };
 
-        this.chartOptions = {
-            plugins: {
-                legend: {
-                    labels: {
-                        color: textColor
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    ticks: {
-                        color: textColorSecondary
-                    },
-                    grid: {
-                        color: surfaceBorder,
-                        drawBorder: false
-                    }
-                },
-                y: {
-                    ticks: {
-                        color: textColorSecondary
-                    },
-                    grid: {
-                        color: surfaceBorder,
-                        drawBorder: false
-                    }
+        this.pieOptionsGeneral = { plugins: {
+            legend: {
+                labels: {
+                    color: textColor
                 }
             }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    color: textColorSecondary
+                },
+                grid: {
+                    color: surfaceBorder,
+                    drawBorder: false
+                }
+            },
+            x: {
+                ticks: {
+                    color: textColorSecondary
+                },
+                grid: {
+                    color: surfaceBorder,
+                    drawBorder: false
+                }
+            }
+        }
         };
     }
 
-    ngOnDestroy() {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-        }
+    salvarPeriodo() {
+        this.visiblePeriodPlan = false;
+        this.visibleInOut = true;
+        this.plan.namePlan = this.planForm.get('namePlan').value;
     }
 }
