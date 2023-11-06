@@ -22,6 +22,8 @@ import { RippleModule } from 'primeng/ripple';
 import { FieldsetModule } from 'primeng/fieldset';
 import { EntriesModule } from '../entries/entries.module';
 import { OutsModule } from '../outs/outs.module';
+import { InvestimentsModule } from '../investiments/investiments.module';
+import { PatrymonyModule } from '../patrymony/patrymony.module';
 
 @NgModule({
     imports: [
@@ -47,6 +49,8 @@ import { OutsModule } from '../outs/outs.module';
         FieldsetModule,
         EntriesModule,
         OutsModule,
+        InvestimentsModule,
+        PatrymonyModule,
     ],
     declarations: [DashboardComponent],
     providers: [MessageService]

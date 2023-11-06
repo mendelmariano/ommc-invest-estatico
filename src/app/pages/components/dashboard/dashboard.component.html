@@ -33,7 +33,7 @@
                                       borderRadius: 'var(--border-radius)',
                                       }"
                           >
-                            <h4>Invest.: </h4> {{ 0 | currency: 'BRL' }}
+                            <h4>Invest.: </h4> {{ totalInvestments | currency: 'BRL' }}
                           </div>
 
                         </div>
@@ -98,7 +98,26 @@
                         <app-outs-crud
                             (totalOutsChanged)="onTotalOutsChanged($event)"
                             (outsChanged)="onOutsChanged($event)">
-                    </app-outs-crud>
+                        </app-outs-crud>
+
+                    </div>
+
+                    <div class="col-12 md:col-6">
+                        <app-investments-crud
+                            (totalInvestmentsChanged)="onTotalInvestmentsChanged($event)"
+                            (investmentsChanged)="onInvestmentsChanged($event)"
+                        >
+
+                        </app-investments-crud>
+
+                    </div>
+
+                    <div class="col-12 md:col-6">
+                        <app-patrymony-crud
+
+                        >
+
+                        </app-patrymony-crud>
 
                     </div>
                 </div>

@@ -5,12 +5,13 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Plan } from '../../shareds/models/plan.model';
 import { Entry } from '../../api/entry';
 import { Out } from '../../api/out';
+import { Investment } from '../../api/investment';
 
 @Component({
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardComponent implements OnInit {
 
     items: MenuItem[] | undefined;
     visiblePeriodPlan: boolean = false;
@@ -26,6 +27,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     totalOuts: number = 0;
     outs: Out[] = [];
 
+    totalInvestments: number = 0;
+    investments: Investment[] = [];
+
     constructor(private messageService: MessageService,
                 public layoutService: LayoutService,
                 private fb: FormBuilder) {
@@ -39,9 +43,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
 
     }
-    ngOnDestroy(): void {
-        throw new Error('Method not implemented.');
-    }
+
 
     ngOnInit() {
         this.initMenuNew();
@@ -71,6 +73,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.entries = entries;
         this.updatePieChart();
     }
+
+
+    onTotalInvestmentsChanged(total: number) {
+        this.totalInvestments = total;
+        this.updatePieChart();
+    }
+
+    onInvestmentsChanged(investments: Investment[]) {
+        this.investments = investments;
+        this.updatePieChart();
+    }
+
 
     onTotalOutsChanged(total: number) {
         this.totalOuts = total;
@@ -111,13 +125,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
 
         this.pieDataGeneral = {
-            labels: ['Receitas', 'Gastos'],
+            labels: ['Receitas', 'Gastos', 'Investimentos'],
             datasets: [
                 {
                     label: 'Situação mensal',
-                    data: [this.totalEntries, this.totalOuts],
-                    backgroundColor: [ 'rgba(75, 192, 192, 0.2)', 'rgba(255, 50, 0, 0.2)'],
-                    borderColor: ['rgb(255, 159, 64)', 'rgb(75, 192, 192)'],
+                    data: [this.totalEntries, this.totalOuts, this.totalInvestments],
+                    backgroundColor: [ 'rgba(75, 192, 192, 0.2)', 'rgba(255, 50, 0, 0.2)', 'rgba(255, 215, 0, 0.2)'],
+                    borderColor: ['rgb(255, 159, 64)', 'rgb(75, 192, 192)', 'rgb(255, 215, 0)'],
                     borderWidth: 1
                 }
             ]
