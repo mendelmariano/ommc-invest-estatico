@@ -53,7 +53,7 @@ export class InvestmentsCrudComponent {
             { field: 'category', header: 'Category' },
         ];
 
-        this.mockInvestments();
+       this.mockInvestments();
 
     }
 

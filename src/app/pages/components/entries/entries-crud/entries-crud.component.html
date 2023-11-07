@@ -78,7 +78,10 @@
                                 <label for="description">Descrição</label>
                                 <textarea id="description" pInputTextarea [(ngModel)]="entry.description" required rows="3" cols="20"></textarea>
                             </div>
-
+                            <div class="field">
+                                <label for="description">Data</label>
+                                <p-calendar inputId="dataInicio" [(ngModel)]="entry.data"></p-calendar>
+                            </div>
 
                             <div class="field">
                                 <label class="mb-3">Categoria</label>

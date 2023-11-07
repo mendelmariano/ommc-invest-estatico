@@ -6,6 +6,7 @@ import { Plan } from '../../shareds/models/plan.model';
 import { Entry } from '../../api/entry';
 import { Out } from '../../api/out';
 import { Investment } from '../../api/investment';
+import { Patrymony } from '../../api/patrymony';
 
 @Component({
   templateUrl: './dashboard.component.html',
@@ -21,14 +22,22 @@ export class DashboardComponent implements OnInit {
     pieDataGeneral: any;
     pieOptionsGeneral: any;
 
+    patrymoniesDataGraph: any;
+    patrymoniesDataOpt: any;
+
     totalEntries: number = 0;
     entries: Entry[] = [];
 
     totalOuts: number = 0;
     outs: Out[] = [];
 
+    totalPatrymonies: number = 0;
+    patrymonies: Patrymony[] = [];
+
     totalInvestments: number = 0;
     investments: Investment[] = [];
+
+    showPatrymoniesPercentages: boolean = false;
 
     constructor(private messageService: MessageService,
                 public layoutService: LayoutService,
@@ -39,7 +48,7 @@ export class DashboardComponent implements OnInit {
             namePlan: ['', Validators.required],
         });
 
-        this.mockDatas();
+
 
 
     }
@@ -48,13 +57,15 @@ export class DashboardComponent implements OnInit {
     ngOnInit() {
         this.initMenuNew();
         this.updatePieChart();
+        this.updateGraphPatrymonies();
+        this.mockDatas();
     }
 
     mockDatas() {
         // Valores mockados
         const mockValues = {
-            dataInicio: "2023-11-01T03:00:00.000Z",
-            dataFim: "2023-11-30T03:00:00.000Z",
+            dataInicio: new Date("2023-11-01T03:00:00.000Z"),
+            dataFim: new Date("2023-11-30T03:00:00.000Z"),
             namePlan: "Novembro/2024"
         };
 
@@ -71,6 +82,16 @@ export class DashboardComponent implements OnInit {
 
     onEntriesChanged(entries: Entry[]) {
         this.entries = entries;
+        this.updatePieChart();
+    }
+
+    onTotalPatrymoniesChanged(total: number) {
+        this.totalPatrymonies = total;
+        this.updatePieChart();
+    }
+
+    onPatrymoniesChanged(patrymonies: Patrymony[]) {
+        this.patrymonies = patrymonies;
         this.updatePieChart();
     }
 
@@ -96,6 +117,11 @@ export class DashboardComponent implements OnInit {
         this.updatePieChart();
     }
 
+    togglePatrymoniesPercentages() {
+        this.showPatrymoniesPercentages = !this.showPatrymoniesPercentages;
+        this.updateGraphPatrymonies();
+      }
+
     initMenuNew() {
         this.items = [
             {
@@ -114,6 +140,83 @@ export class DashboardComponent implements OnInit {
             },
         ];
     }
+
+
+
+    updateGraphPatrymonies() {
+        const categoryValues = this.calculateCategoryValues(this.patrymonies);
+
+        const labels = Object.keys(categoryValues);
+        const data = Object.values(categoryValues);
+
+        const documentStyle = getComputedStyle(document.documentElement);
+        const textColor = documentStyle.getPropertyValue('--text-color');
+
+        // Verifica se deve exibir em percentuais ou valores absolutos
+        if (this.showPatrymoniesPercentages) {
+          // Converte os valores para números
+          const numericData = data.map((value: any) => parseFloat(value));
+
+          const totalPatrymoniesValue = numericData.reduce((total, value) => total + value, 0);
+
+          // Calcula percentagens
+          const percentages = numericData.map(value => ((value / totalPatrymoniesValue) * 100).toFixed(2));
+
+          // Atualiza os dados com percentagens
+          this.patrymoniesDataGraph = {
+            labels: labels,
+            datasets: [
+              {
+                data: percentages,
+                backgroundColor: [documentStyle.getPropertyValue('--blue-500'), documentStyle.getPropertyValue('--yellow-500'), documentStyle.getPropertyValue('--green-500')],
+                hoverBackgroundColor: [documentStyle.getPropertyValue('--blue-400'), documentStyle.getPropertyValue('--yellow-400'), documentStyle.getPropertyValue('--green-400')]
+              }
+            ]
+          };
+        } else {
+          // Exibe os valores absolutos
+          this.patrymoniesDataGraph = {
+            labels: labels,
+            datasets: [
+              {
+                data: data,
+                backgroundColor: [documentStyle.getPropertyValue('--blue-500'), documentStyle.getPropertyValue('--yellow-500'), documentStyle.getPropertyValue('--green-500')],
+                hoverBackgroundColor: [documentStyle.getPropertyValue('--blue-400'), documentStyle.getPropertyValue('--yellow-400'), documentStyle.getPropertyValue('--green-400')]
+              }
+            ]
+          };
+        }
+
+        this.patrymoniesDataOpt = {
+          cutout: '60%',
+          plugins: {
+            legend: {
+              labels: {
+                color: textColor
+              }
+            }
+          }
+        };
+      }
+
+    calculateCategoryValues(data) {
+        const categoryValues = {};
+
+        data.forEach(item => {
+          const category = item.category;
+          const price = item.price;
+
+          if (categoryValues[category]) {
+            categoryValues[category] += price;
+          } else {
+            categoryValues[category] = price;
+          }
+        });
+
+        return categoryValues;
+      }
+
+
 
 
 
@@ -166,6 +269,7 @@ export class DashboardComponent implements OnInit {
             }
         }
         };
+        this.updateGraphPatrymonies();
     }
 
     salvarPeriodo() {

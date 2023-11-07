@@ -31,7 +31,7 @@ export class OutsCrudComponent {
 
     cols: any[] = [];
 
-    categorias = ['Cartão de Crédito', 'Moradia', 'Alimentação', 'Transporte', 'Saúde', 'Educação', 'Lazer e Entretenimento', 'Vestuário e Acessórios'];
+    categorias = ['Cartão de Crédito', 'Moradia', 'Alimentação', 'Transporte', 'Saúde', 'Educação', 'Lazer e Entretenimento', 'Vestuário e Acessórios', 'Outros'];
     totalOuts: number = 0;
     msgTotalOuts: string = `Valor Total: R$ 0000,00`
 

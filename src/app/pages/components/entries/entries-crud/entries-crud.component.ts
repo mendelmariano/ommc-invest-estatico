@@ -56,10 +56,10 @@ export class EntriesCrudComponent {
 
     mockEntries() {
        const mockEntriesValues: Entry[] = [
-            { "name": "Coopersytem", "category": "Salário", "price": 20000, "id": "1ZIta" },
-            { "name": "FAB", "category": "Salário", "price": 5000, "id": "IEkO7" },
-            { "name": "Controles", "category": "Outros", "price": 300, "id": "IEkO8" },
-            { "name": "Casa 01", "category": "Renda Extra", "price": 1300, "id": "IEkO9" }
+            { "name": "Coopersytem", "data": new Date("2023-11-07T19:23:37.686Z"), "category": "Salário", "price": 20000, "id": "1ZIta" },
+            { "name": "FAB", "data": new Date("2023-11-07T19:23:37.686Z"), "category": "Salário", "price": 5000, "id": "IEkO7" },
+            { "name": "Controles", "data": new Date("2023-11-07T19:23:37.686Z"), "category": "Outros", "price": 300, "id": "IEkO8" },
+            { "name": "Casa 01", "data": new Date("2023-11-07T19:23:37.686Z"), "category": "Renda Extra", "price": 1300, "id": "IEkO9" }
            ];
         this.entries.push(...mockEntriesValues);
         this.sumEntries();
@@ -67,6 +67,7 @@ export class EntriesCrudComponent {
 
     openNew() {
         this.entry = {};
+        this.entry.data = new Date();
         this.submitted = false;
         this.entryDialog = true;
     }
