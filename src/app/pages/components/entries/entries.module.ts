@@ -19,6 +19,8 @@ import { DropdownModule } from 'primeng/dropdown';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { EntryService } from '../../service/entry.service';
+import { SpeedDialModule } from 'primeng/speeddial';
+import { CategoryService } from '../../service/category.service';
 
 
 @NgModule({
@@ -44,11 +46,12 @@ import { EntryService } from '../../service/entry.service';
     DropdownModule,
     RadioButtonModule,
     InputNumberModule,
+    SpeedDialModule,
 
   ],
   exports: [
     EntriesCrudComponent
   ],
-  providers: [MessageService, EntryService]
+  providers: [MessageService, EntryService, CategoryService]
 })
 export class EntriesModule { }

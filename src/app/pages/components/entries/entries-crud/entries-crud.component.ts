@@ -1,7 +1,10 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
+import { Category } from 'src/app/pages/api/category';
 import { Entry } from 'src/app/pages/api/entry';
+import { MovementRequest } from 'src/app/pages/api/movement';
+import { PeriodSearch } from 'src/app/pages/api/patrimony';
 import { EntryService } from 'src/app/pages/service/entry.service';
 
 @Component({
@@ -9,14 +12,25 @@ import { EntryService } from 'src/app/pages/service/entry.service';
   templateUrl: './entries-crud.component.html',
   styleUrls: ['./entries-crud.component.scss']
 })
-export class EntriesCrudComponent {
+export class EntriesCrudComponent implements OnInit, OnChanges {
 
     @Output() totalEntriesChanged = new EventEmitter<number>();
     @Output() entriesChanged = new EventEmitter<Entry[]>();
 
+    @Input() busca: any;
+
+
+    @Input() categorias: Category[];
+
+    @Input() type_id: number = 1;
+    @Input() user_id: string;
+
+    @Input() periodSearch: PeriodSearch;
+
+
     entryDialog: boolean = false;
 
-    deleteProductDialog: boolean = false;
+    deleteEntryDialog: boolean = false;
 
     deleteEntriesDialog: boolean = false;
 
@@ -30,9 +44,10 @@ export class EntriesCrudComponent {
 
     cols: any[] = [];
 
+    categoriasReceita: Category[];
 
 
-    categorias = ['Salário', 'Renda Extra', 'Investimentos', 'Outros'];
+
     totalEntries: number = 0;
     msgTotalEntries: string = `Valor Total: R$ 0000,00`
 
@@ -42,7 +57,6 @@ export class EntriesCrudComponent {
     constructor(private entryService: EntryService, private messageService: MessageService) { }
 
     ngOnInit() {
-       // this.entryService.getEntries().then(data => this.entries = data);
 
         this.cols = [
             { field: 'entry', header: 'Entry' },
@@ -50,7 +64,47 @@ export class EntriesCrudComponent {
             { field: 'category', header: 'Category' },
         ];
 
-        this.mockEntries();
+        this.getEntriesForPeriod(this.periodSearch);
+
+
+    }
+
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['categorias']) {
+            this.filtraCategorias();
+          }
+
+        if (changes['periodSearch'] && !changes['periodSearch'].firstChange) {
+        // A propriedade periodSearch foi alterada, você pode realizar ações aqui
+        this.getEntriesForPeriod(this.periodSearch);
+        }
+    }
+
+    filtraCategorias() {
+        if(this.categorias){
+            this.categoriasReceita = this.categorias.filter(categoria => categoria.type_id === 1);
+        }
+
+    }
+
+    getEntries() {
+        this.entryService.getEntries()
+        .then((entriesValues: Entry[]) => {
+            this.entries.push(...entriesValues);
+            this.sumEntries();
+        }
+        )
+
+    }
+
+    getEntriesForPeriod(period: PeriodSearch) {
+        this.entryService.getEntriesForPeriod(period)
+        .then((entriesValues: Entry[]) => {
+            this.entries = entriesValues;
+            this.sumEntries();
+        }
+        )
 
     }
 
@@ -76,28 +130,63 @@ export class EntriesCrudComponent {
         this.deleteEntriesDialog = true;
     }
 
-    editProduct(entry: Entry) {
+    editEntry(entry: Entry) {
+        const categoriaEncontrada = this.categoriasReceita.find(categoria => categoria.name === entry.category);
+
+        if (categoriaEncontrada) {
+            entry.category = categoriaEncontrada.id.toString();
+        }
+
         this.entry = { ...entry };
         this.entryDialog = true;
+        this.sumEntries();
     }
 
-    deleteProduct(entry: Entry) {
-        this.deleteProductDialog = true;
+    deleteEntry(entry: Entry) {
+        this.deleteEntryDialog = true;
         this.entry = { ...entry };
+        this.sumEntries();
     }
 
     confirmDeleteSelected() {
         this.deleteEntriesDialog = false;
+        this.selectedEntries.map(
+            (entry: Entry) => {
+                this.entryService.delete(entry).then(
+                    entry => {
+                        this.entries = this.entries.filter(val => val.id !== this.entry.id);
+                        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Entry Deleted', life: 3000 });
+                        this.entry = {};
+                        this.sumEntries();
+                    }
+                ).catch(
+                    err => {
+                        this.messageService.add({ severity: 'danger', summary: 'Erro', detail: 'Erro na execução', life: 3000 });
+                    }
+                )
+            }
+        );
         this.entries = this.entries.filter(val => !this.selectedEntries.includes(val));
         this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Entries Deleted', life: 3000 });
         this.selectedEntries = [];
+        this.sumEntries();
     }
 
     confirmDelete() {
-        this.deleteProductDialog = false;
-        this.entries = this.entries.filter(val => val.id !== this.entry.id);
-        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Entry Deleted', life: 3000 });
-        this.entry = {};
+        this.deleteEntryDialog = false;
+        this.entryService.delete(this.entry).then(
+            entry => {
+                this.entries = this.entries.filter(val => val.id !== this.entry.id);
+                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Entry Deleted', life: 3000 });
+                this.entry = {};
+                this.sumEntries();
+            }
+        ).catch(
+            err => {
+                this.messageService.add({ severity: 'danger', summary: 'Erro', detail: 'Erro na execução', life: 3000 });
+            }
+        )
+
     }
 
     hideDialog() {
@@ -105,25 +194,74 @@ export class EntriesCrudComponent {
         this.submitted = false;
     }
 
-    saveProduct() {
+    saveEntry() {
         this.submitted = true;
 
-        if (this.entry.name?.trim()) {
+
+        if (this.entry.name?.trim() && this.entry.category && this.entry.price && this.entry.data  ) {
             if (this.entry.id) {
+                const entryRequest: MovementRequest = {
+                    category_id: +this.entry.category,
+                    data: this.entry.data,
+                    description: this.entry.description,
+                    name: this.entry.name,
+                    price: this.entry.price,
+                    type_id: this.type_id,
+                    user_id: this.user_id,
+                    id: this.entry.id,
+                }
+
+                this.entryService.update(entryRequest).then(
+                    entrada => {
+                        const categoriaEncontrada = this.categoriasReceita.find(categoria => categoria.id === +this.entry.category);
+
+                        if (categoriaEncontrada) {
+                        this.entry.category = categoriaEncontrada.name;
+                        }
+
+                        // @ts-ignore
+                        this.entries[this.findIndexById(this.entry.id)] = entrada;
+                        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Entry Updated', life: 3000 });
+                    });
+
+                const categoriaEncontrada = this.categoriasReceita.find(categoria => categoria.id === +this.entry.category);
+
+                if (categoriaEncontrada) {
+                this.entry.category = categoriaEncontrada.name;
+                }
+
                 // @ts-ignore
                 this.entries[this.findIndexById(this.entry.id)] = this.entry;
+                this.sumEntries();
                 this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Entry Updated', life: 3000 });
             } else {
-                this.entry.id = this.createId();
+                const entryRequest: MovementRequest = {
+                    category_id: +this.entry.category,
+                    data: this.entry.data,
+                    description: this.entry.description,
+                    name: this.entry.name,
+                    price: this.entry.price,
+                    type_id: this.type_id,
+                    user_id: this.user_id,
+                }
+
+                this.entryService.createEntries(entryRequest).then(
+                    entrada => {
+                        this.entry.id = entrada.id;
+                        this.entries.push(entrada);
+                        this.sumEntries();
+                        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Entry Created', life: 3000 });
+                    }
+                )
+                // this.entry.id = this.createId();
                 // @ts-ignore
-                this.entries.push(this.entry);
-                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Entry Created', life: 3000 });
+
             }
 
             this.entries = [...this.entries];
             this.entryDialog = false;
             this.entry = {};
-            this.sumEntries();
+            // this.sumEntries();
 
         }
     }
@@ -154,10 +292,14 @@ export class EntriesCrudComponent {
     }
 
     sumEntries(): number {
+        console.log('Entrou na soma', this.entries);
         let total = 0;
         for (const entry of this.entries) {
+            console.log('Entrada: ', entry);
           if (entry.price) {
+            console.log('Entrou no if soma', entry);
             total += entry.price;
+            console.log('Total após esta iteração:', total);
           }
         }
 

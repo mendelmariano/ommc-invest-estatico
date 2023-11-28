@@ -1,7 +1,7 @@
 export interface TokenResponse {
-    id: number;
+    id: string;
     user: {
-        id: number;
+        id: string;
         name: string;
         email: string;
         password_hash: string;

@@ -24,6 +24,7 @@ import { EntriesModule } from '../entries/entries.module';
 import { OutsModule } from '../outs/outs.module';
 import { InvestimentsModule } from '../investiments/investiments.module';
 import { PatrymonyModule } from '../patrymony/patrymony.module';
+import { CategoryService } from '../../service/category.service';
 
 @NgModule({
     imports: [
@@ -53,6 +54,6 @@ import { PatrymonyModule } from '../patrymony/patrymony.module';
         PatrymonyModule,
     ],
     declarations: [DashboardComponent],
-    providers: [MessageService]
+    providers: [MessageService, CategoryService]
 })
 export class DashboardModule { }

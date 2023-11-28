@@ -27,6 +27,15 @@
     }
 }
 
+:host ::ng-deep .p-speeddial-action-icon.one::before {
+    content: 'Período' !important;
+  }
+
+  :host ::ng-deep .p-speeddial-action-icon.salvar::before {
+    content: 'Salvar' !important;
+  }
+
+
 :host ::ng-deep .p-toolbar {
     display: flex;
     align-items: center;
@@ -34,10 +43,3 @@
     flex-wrap: nowrap; /* Desabilita o wrap */
 }
 
-:host ::ng-deep .p-speeddial-action-icon.one::before {
-    content: 'Novo' !important;
-  }
-
-  :host ::ng-deep .p-speeddial-action-icon.salvar::before {
-    content: 'Salvar' !important;
-  }

@@ -7,6 +7,11 @@ import { Entry } from '../../api/entry';
 import { Out } from '../../api/out';
 import { Investment } from '../../api/investment';
 import { Patrymony } from '../../api/patrymony';
+import { CategoryService } from '../../service/category.service';
+import { Category } from '../../api/category';
+import { UsersService } from '../users/users.service';
+import { AuthServiceService } from '../auth/auth-service.service';
+import { PeriodSearch } from '../../api/patrimony';
 
 @Component({
   templateUrl: './dashboard.component.html',
@@ -21,6 +26,12 @@ export class DashboardComponent implements OnInit {
     plan: Plan = new Plan();
     pieDataGeneral: any;
     pieOptionsGeneral: any;
+
+
+    gastosData: any;
+    gastosGraphOpt: any;
+
+    periodSearch: PeriodSearch;
 
     patrymoniesDataGraph: any;
     patrymoniesDataOpt: any;
@@ -37,14 +48,20 @@ export class DashboardComponent implements OnInit {
     totalInvestments: number = 0;
     investments: Investment[] = [];
 
+    categorias: Category[] = [];
+    user_id: string;
+
     showPatrymoniesPercentages: boolean = false;
 
     constructor(private messageService: MessageService,
                 public layoutService: LayoutService,
-                private fb: FormBuilder) {
+                private fb: FormBuilder,
+                private categoryService: CategoryService,
+                private authService: AuthServiceService,
+                ) {
         this.planForm = this.fb.group({
-            dataInicio: ['', Validators.required],
-            dataFim: ['', Validators.required],
+            startDate: ['', Validators.required],
+            endDate: ['', Validators.required],
             namePlan: ['', Validators.required],
         });
 
@@ -59,6 +76,24 @@ export class DashboardComponent implements OnInit {
         this.updatePieChart();
         this.updateGraphPatrymonies();
         this.mockDatas();
+        this.initCategories();
+        this.updateGastosChart();
+
+        this.authService.getUser().subscribe(
+            user => this.user_id = user.id
+        )
+    }
+
+    initCategories() {
+        this.categoryService.getCategories()
+            .then(data => {
+                this.categorias = data;
+                this.updateGastosChart(); // Mova a chamada para cá
+            })
+            .catch(error => {
+                console.error("Erro ao obter categorias:", error);
+                // Trate o erro conforme necessário
+            });
     }
 
     mockDatas() {
@@ -66,7 +101,7 @@ export class DashboardComponent implements OnInit {
         const mockValues = {
             dataInicio: new Date("2023-11-01T03:00:00.000Z"),
             dataFim: new Date("2023-11-30T03:00:00.000Z"),
-            namePlan: "Novembro/2024"
+            namePlan: "Mês Atual"
         };
 
         // Use o método patchValue para definir os valores iniciais
@@ -93,6 +128,7 @@ export class DashboardComponent implements OnInit {
     onPatrymoniesChanged(patrymonies: Patrymony[]) {
         this.patrymonies = patrymonies;
         this.updatePieChart();
+        this.updateGraphPatrymonies();
     }
 
 
@@ -110,11 +146,14 @@ export class DashboardComponent implements OnInit {
     onTotalOutsChanged(total: number) {
         this.totalOuts = total;
         this.updatePieChart();
+        this.updateGastosChart();
     }
 
     onOutsChanged(outs: Out[]) {
+        console.log('Gastos alterados: ', outs);
         this.outs = outs;
         this.updatePieChart();
+        this.updateGastosChart();
     }
 
     togglePatrymoniesPercentages() {
@@ -131,13 +170,7 @@ export class DashboardComponent implements OnInit {
                     this.messageService.add({ severity: 'info', summary: 'Add', detail: 'Data Added' });
                     this.visiblePeriodPlan = true;
                 }
-            },
-            {
-                icon: 'salvar',
-                command: () => {
-                    this.messageService.add({ severity: 'success', summary: 'Update', detail: 'Data Updated' });
-                }
-            },
+            }
         ];
     }
 
@@ -216,8 +249,62 @@ export class DashboardComponent implements OnInit {
         return categoryValues;
       }
 
+      getUniqueCategoriesAndSum(expenses: Out[]) {
+        const sumByCategory: Record<string, number> = {};
+        const uniqueCategories = new Set<string>();
+
+        expenses.forEach(expense => {
+          const { category, price } = expense;
+
+          uniqueCategories.add(category);
+          sumByCategory[category] = (sumByCategory[category] || 0) + price;
+        });
+
+        const labels: string[] = Array.from(uniqueCategories);
+        const values: number[] = labels.map(category => sumByCategory[category] || 0);
+
+        return { labels, values };
+      }
 
 
+      updateGastosChart() {
+
+        const documentStyle = getComputedStyle(document.documentElement);
+        const textColor = documentStyle.getPropertyValue('--text-color');
+
+        const gastos = this.getUniqueCategoriesAndSum(this.outs);
+
+        console.log('Meus gastos: ', gastos);
+
+        this.gastosData = {
+            labels: gastos.labels,
+            datasets: [
+                {
+                    data: gastos.values,
+                    backgroundColor: [
+                        documentStyle.getPropertyValue('--indigo-500'),
+                        documentStyle.getPropertyValue('--purple-500'),
+                        documentStyle.getPropertyValue('--teal-500')
+                    ],
+                    hoverBackgroundColor: [
+                        documentStyle.getPropertyValue('--indigo-400'),
+                        documentStyle.getPropertyValue('--purple-400'),
+                        documentStyle.getPropertyValue('--teal-400')
+                    ]
+                }]
+        };
+
+        this.gastosGraphOpt = {
+            plugins: {
+                legend: {
+                    labels: {
+                        usePointStyle: true,
+                        color: textColor
+                    }
+                }
+            }
+        };
+      }
 
 
     updatePieChart() {
@@ -276,5 +363,12 @@ export class DashboardComponent implements OnInit {
         this.visiblePeriodPlan = false;
         this.visibleInOut = true;
         this.plan.namePlan = this.planForm.get('namePlan').value;
+        const newDataSearch: PeriodSearch = {
+            endDate: new Date(this.planForm.get('startDate').value),
+            startDate: new Date(this.planForm.get('endDate').value)
+        }
+       this.periodSearch = newDataSearch;
+       this.updateGraphPatrymonies();
+
     }
 }

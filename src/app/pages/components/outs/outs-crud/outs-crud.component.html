@@ -11,7 +11,7 @@
                         <p-toolbar styleClass="mb-4">
                             <ng-template pTemplate="left">
                                 <div class="my-2">
-                                    <button pButton pRipple label="Nova" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
+                                    <button pButton pRipple label="Adicionar" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
                                     <button pButton pRipple label="Deletar" icon="pi pi-trash" class="p-button-danger" (click)="deleteSelectedOuts()" [disabled]="!selectedOuts || !selectedOuts.length"></button>
                                 </div>
                             </ng-template>
@@ -19,7 +19,7 @@
 
                         </p-toolbar>
 
-                        <p-table #dt [value]="entries" [columns]="cols" responsiveLayout="scroll" [rows]="10" [globalFilterFields]="['name','country.name','representative.name','status']" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [(selection)]="selectedOuts" selectionMode="multiple" [rowHover]="true" dataKey="id">
+                        <p-table #dt [value]="outs" [columns]="cols" responsiveLayout="scroll" [rows]="10" [globalFilterFields]="['name','country.name','representative.name','status']" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} outs" [(selection)]="selectedOuts" selectionMode="multiple" [rowHover]="true" dataKey="id">
                             <ng-template pTemplate="caption">
                                 <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                                     <h5 class="m-0">Saídas no período</h5>
@@ -40,26 +40,26 @@
                                     <th></th>
                                 </tr>
                             </ng-template>
-                            <ng-template pTemplate="body" let-entry>
+                            <ng-template pTemplate="body" let-out>
                                 <tr>
                                     <td>
-                                        <p-tableCheckbox [value]="entry"></p-tableCheckbox>
+                                        <p-tableCheckbox [value]="out"></p-tableCheckbox>
                                     </td>
 
                                     <td style="width:14%; min-width:10rem;">
                                         <span class="p-column-title">Nome</span>
-                                        {{entry.name}}
+                                        {{out.name}}
                                     </td>
 
                                     <td style="width:14%; min-width:8rem;">
                                         <span class="p-column-title">Valor</span>
-                                        {{entry.price | currency:'BRL'}}
+                                        {{out.price | currency:'BRL'}}
                                     </td>
 
                                     <td>
                                         <div class="flex">
-                                            <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editProduct(entry)"></button>
-                                            <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deleteProduct(entry)"></button>
+                                            <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editOut(out)"></button>
+                                            <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deleteOut(out)"></button>
                                         </div>
                                     </td>
                                 </tr>
@@ -67,38 +67,42 @@
                         </p-table>
                     </div>
 
-                    <p-dialog [(visible)]="entryDialog" [style]="{width: '450px'}" header="Detalhes da Entrada" [modal]="true" class="p-fluid">
+                    <p-dialog [(visible)]="outDialog" [style]="{width: '450px'}" header="Detalhes da Saídas" [modal]="true" class="p-fluid">
                         <ng-template pTemplate="content">
                             <div class="field">
                                 <label for="name">Nome</label>
-                                <input type="text" pInputText id="name" [(ngModel)]="entry.name" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !entry.name}"/>
-                                <small class="ng-dirty ng-invalid" *ngIf="submitted && !entry.name">Nome is required.</small>
+                                <input type="text" pInputText id="name" [(ngModel)]="out.name" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !out.name}"/>
+                                <small class="ng-dirty ng-invalid" *ngIf="submitted && !out.name">Nome is required.</small>
                             </div>
                             <div class="field">
                                 <label for="description">Descrição</label>
-                                <textarea id="description" pInputTextarea [(ngModel)]="entry.description" required rows="3" cols="20"></textarea>
+                                <textarea id="description" pInputTextarea [(ngModel)]="out.description" required rows="3" cols="20"></textarea>
                             </div>
 
+                            <div class="field">
+                                <label for="description">Data</label>
+                                <p-calendar dateFormat="dd.mm.yy" inputId="data" [(ngModel)]="out.data"></p-calendar>
+                            </div>
 
                             <div class="field">
                                 <label class="mb-3">Categoria</label>
                                 <div class="formgrid grid">
-                                  <div class="field-radiobutton col-6" *ngFor="let categoria of categorias; let i = index">
+                                  <div class="field-radiobutton col-6" *ngFor="let categoria of categoriasGastos; let i = index">
                                     <p-radioButton
-                                      [id]="'category' + i"
+                                      [id]="categoria.id"
                                       name="category"
-                                      [value]="categoria"
-                                      [(ngModel)]="entry.category"
+                                      [value]="categoria.id"
+                                      [(ngModel)]="out.category"
                                     ></p-radioButton>
-                                    <label [for]="'category' + i">{{ categoria }}</label>
+                                    <label [for]="'category' + i">{{ categoria.name }}</label>
                                   </div>
                                 </div>
-                              </div>
+                            </div>
 
                             <div class="formgrid grid">
                                 <div class="field col">
                                     <label for="price">Valor</label>
-                                    <p-inputNumber id="price" [(ngModel)]="entry.price" mode="currency" currency="USD" locale="en-US"></p-inputNumber>
+                                    <p-inputNumber id="price" [(ngModel)]="out.price" mode="currency" currency="USD" locale="en-US"></p-inputNumber>
                                 </div>
 
                             </div>
@@ -106,17 +110,17 @@
 
                         <ng-template pTemplate="footer">
                             <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
-                            <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveProduct()"></button>
+                            <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveOut()"></button>
                         </ng-template>
                     </p-dialog>
 
-                    <p-dialog [(visible)]="deleteProductDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+                    <p-dialog [(visible)]="deleteOutDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
                         <div class="flex align-items-center justify-content-center">
                             <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
-                            <span *ngIf="entry">Tem certeza que deseja deletar esta entrada? <b>{{entry.name}}</b>?</span>
+                            <span *ngIf="out">Tem certeza que deseja deletar esta entrada? <b>{{out.name}}</b>?</span>
                         </div>
                         <ng-template pTemplate="footer">
-                            <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="deleteProductDialog = false"></button>
+                            <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="deleteOutDialog = false"></button>
                             <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes" (click)="confirmDelete()"></button>
                         </ng-template>
                     </p-dialog>
@@ -133,6 +137,6 @@
                     </p-dialog>
                 </div>
         </p-fieldset>
-
-        {{ entries | json }}
+<!--
+        {{ outs | json }} -->
 </div>

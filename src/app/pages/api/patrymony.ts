@@ -4,4 +4,5 @@ export interface Patrymony {
     description?: string;
     price?: number;
     category?: string;
+    data?: Date;
 }

@@ -1,6 +1,6 @@
 
 export class User {
-    id?:number | string;
+    id?: string;
     name: string;
     email: string;
     whatsapp?: string;

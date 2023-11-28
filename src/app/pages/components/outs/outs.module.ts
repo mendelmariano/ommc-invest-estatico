@@ -20,6 +20,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { OutService } from '../../service/out.service';
+import { CategoryService } from '../../service/category.service';
 
 
 @NgModule({
@@ -49,6 +50,6 @@ import { OutService } from '../../service/out.service';
   exports: [
     OutsCrudComponent
   ],
-  providers: [MessageService, OutService]
+  providers: [MessageService, OutService, CategoryService]
 })
 export class OutsModule { }

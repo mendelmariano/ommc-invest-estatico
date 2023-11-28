@@ -1,6 +1,8 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
+import { Category } from 'src/app/pages/api/category';
+import { Patrimony, PatrimonyRequest, PeriodSearch } from 'src/app/pages/api/patrimony';
 import { Patrymony } from 'src/app/pages/api/patrymony';
 import { PatrymonyService } from 'src/app/pages/service/patrymony.service';
 
@@ -9,7 +11,7 @@ import { PatrymonyService } from 'src/app/pages/service/patrymony.service';
   templateUrl: './patrymony-crud.component.html',
   styleUrls: ['./patrymony-crud.component.scss']
 })
-export class PatrymonyCrudComponent {
+export class PatrymonyCrudComponent implements OnInit, OnChanges {
 
 
 
@@ -17,112 +19,307 @@ export class PatrymonyCrudComponent {
     @Output() totalPatrimoniesChanged = new EventEmitter<number>();
     @Output() patrimoniesChanged = new EventEmitter<Patrymony[]>();
 
-    entryDialog: boolean = false;
+    @Input() categorias: Category[];
 
-    deleteProductDialog: boolean = false;
+    @Input() busca: any;
+    @Input() type_id: number = 3;
+    @Input() user_id: string;
+    @Input() periodSearch: PeriodSearch;
+
+    patrimonyDialog: boolean = false;
+
+    patrimonyDialogUpdate: boolean = false;
+
+    deletePatrimonyDialog: boolean = false;
+
+    desativatePatrimonyDialog: boolean = false;
 
     deletePatrymonysDialog: boolean = false;
 
-    entries: Patrymony[] = [];
+    patrimonies: Patrymony[] = [];
 
-    entry: Patrymony = {};
+    patrimony: Patrymony = {};
 
     selectedPatrymonys: Patrymony[] = [];
 
     submitted: boolean = false;
 
+    categoriasPatrimonios: Category[];
+
     cols: any[] = [];
 
-    categorias = ['Imóveis', 'Veículos', 'Investimentos', 'Outro'];
+
+    // categorias = ['Imóveis', 'Veículos', 'Investimentos', 'Outro'];
     totalPatrymonys: number = 0;
     msgTotalPatrymonys: string = `Valor Total: R$ 0000,00`
 
 
     rowsPerPageOptions = [5, 10, 20];
 
-    constructor(private patrymonyService: PatrymonyService, private messageService: MessageService) { }
+    constructor(private patrimonyService: PatrymonyService, private messageService: MessageService) { }
 
     ngOnInit() {
-       // this.entryService.getPatrymonys().then(data => this.entries = data);
+       // this.patrimonyService.getPatrymonys().then(data => this.patrimonies = data);
 
         this.cols = [
-            { field: 'entry', header: 'Patrymony' },
+            { field: 'patrimony', header: 'Patrymony' },
             { field: 'price', header: 'Price' },
             { field: 'category', header: 'Category' },
         ];
 
-        this.mockEntries();
+        // this.getPatromonies();
+        this.getPatromoniesForPeriod(this.periodSearch);
 
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['categorias']) {
+            this.filtraCategorias();
+          }
+
+        if (changes['periodSearch'] && !changes['periodSearch'].firstChange) {
+        // A propriedade periodSearch foi alterada, você pode realizar ações aqui
+        this.getPatromoniesForPeriod(this.periodSearch);
+        }
     }
 
     mockEntries() {
         const mockEntriesValues: Patrymony[] = [
-            { "name": "Casa", "category": "Imóveis", "price": 250000, "id": "xRTVJ" },
-            { "name": "Carro", "category": "Veículos", "price": 90000, "id": "5ylbe" },
-            { "name": "Nubank", "category": "Investimentos", "price": 20000, "id": "5xRpA" },
-            { "name": "PagBank", "category": "Investimentos", "price": 20000, "id": "5xRpA" },
+            { "name": "Casa", "data": new Date("2023-11-07T19:23:37.686Z"), "category": "Imóveis", "price": 250000, "id": "xRTVJ" },
+            { "name": "Carro", "data": new Date("2023-11-07T19:23:37.686Z"), "category": "Veículos", "price": 90000, "id": "5ylbe" },
+            { "name": "Nubank", "data": new Date("2023-11-07T19:23:37.686Z"), "category": "Investimentos", "price": 20000, "id": "5xRpA" },
+            { "name": "PagBank", "data": new Date("2023-11-07T19:23:37.686Z"), "category": "Investimentos", "price": 20000, "id": "5xRpA" },
         ];
-         this.entries.push(...mockEntriesValues);
+         this.patrimonies.push(...mockEntriesValues);
          this.sumPatrymonys();
      }
 
+
+     getPatromonies() {
+        this.patrimonyService.getPatromonies()
+        .then((patrimoniesValues: Patrimony[]) => {
+            this.patrimonies.push(...patrimoniesValues);
+            this.sumPatrymonys();
+        }
+        )
+
+    }
+
+    getPatromoniesForPeriod(period: PeriodSearch) {
+        this.patrimonyService.getPatromoniesForPeriod(period)
+        .then((patrimoniesValues: Patrimony[]) => {
+            this.patrimonies = patrimoniesValues;
+            this.sumPatrymonys();
+        }
+        )
+
+    }
+
+     filtraCategorias() {
+        if(this.categorias){
+            this.categoriasPatrimonios = this.categorias.filter(categoria => categoria.type_id === 4);
+        }
+
+    }
+
     openNew() {
-        this.entry = {};
+        this.patrimony = {};
+        this.patrimony.data = new Date();
         this.submitted = false;
-        this.entryDialog = true;
+        this.patrimonyDialog = true;
     }
 
     deleteSelectedPatrymonys() {
         this.deletePatrymonysDialog = true;
     }
 
-    editProduct(entry: Patrymony) {
-        this.entry = { ...entry };
-        this.entryDialog = true;
+    updatePatrimony(patrimony: Patrymony) {
+
+        const categoriaEncontrada = this.categoriasPatrimonios.find(categoria => categoria.name === patrimony.category);
+
+        if (categoriaEncontrada) {
+            patrimony.category = categoriaEncontrada.id.toString();
+        }
+
+        this.patrimony = { ...patrimony };
+        this.patrimony.data = new Date();
+        this.patrimonyDialogUpdate = true;
+        this.sumPatrymonys();
     }
 
-    deleteProduct(entry: Patrymony) {
-        this.deleteProductDialog = true;
-        this.entry = { ...entry };
+    editPatrimony(patrimony: Patrymony) {
+
+        const categoriaEncontrada = this.categoriasPatrimonios.find(categoria => categoria.name === patrimony.category);
+
+        if (categoriaEncontrada) {
+            patrimony.category = categoriaEncontrada.id.toString();
+        }
+
+        this.patrimony = { ...patrimony };
+        this.patrimonyDialog = true;
+        this.sumPatrymonys();
+    }
+
+    deletePatrimony(patrimony: Patrymony) {
+        this.deletePatrimonyDialog = true;
+        this.patrimony = { ...patrimony };
+        this.sumPatrymonys();
+    }
+
+    desativatePatrimony(patrimony: Patrymony) {
+        this.desativatePatrimonyDialog = true;
+        this.patrimony = { ...patrimony };
+        this.sumPatrymonys();
     }
 
     confirmDeleteSelected() {
         this.deletePatrymonysDialog = false;
-        this.entries = this.entries.filter(val => !this.selectedPatrymonys.includes(val));
-        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Patrymonys Deleted', life: 3000 });
+        this.selectedPatrymonys.map(
+            (patrimony: Patrimony) => {
+                this.patrimonyService.delete(patrimony).then(
+                    patrimony => {
+                        this.patrimonies = this.patrimonies.filter(val => val.id !== this.patrimony.id);
+                        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Patrimônio Deletado', life: 1000 });
+                        this.patrimony = {};
+                        this.sumPatrymonys();
+                    }
+                ).catch(
+                    err => {
+                        this.messageService.add({ severity: 'danger', summary: 'Erro', detail: 'Erro na execução', life: 1000 });
+                    }
+                )
+            }
+        )
+        this.patrimonies = this.patrimonies.filter(val => !this.selectedPatrymonys.includes(val));
+        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Patrymonys Deleted', life: 1000 });
         this.selectedPatrymonys = [];
     }
 
     confirmDelete() {
-        this.deleteProductDialog = false;
-        this.entries = this.entries.filter(val => val.id !== this.entry.id);
-        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Patrymony Deleted', life: 3000 });
-        this.entry = {};
+        this.deletePatrimonyDialog = false;
+        this.patrimonyService.delete(this.patrimony).then(
+            investment => {
+                this.patrimonies = this.patrimonies.filter(val => val.id !== this.patrimony.id);
+                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Patrimônio Deletado', life: 1000 });
+                this.patrimony = {};
+                this.sumPatrymonys();
+            }
+        ).catch(
+            err => {
+                this.messageService.add({ severity: 'danger', summary: 'Erro', detail: 'Erro na execução', life: 1000 });
+            }
+        )
+    }
+
+    confirmDesativated() {
+        this.desativatePatrimonyDialog = false;
+        this.patrimonyService.desative(this.patrimony).then(
+            patrimony => {
+                this.patrimonies = this.patrimonies.filter(val => val.id !== this.patrimony.id);
+                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Patrimônio desativado', life: 1000 });
+                this.patrimony = {};
+                this.sumPatrymonys();
+            }
+        ).catch(
+            err => {
+                this.messageService.add({ severity: 'danger', summary: 'Erro', detail: 'Erro na execução', life: 1000 });
+            }
+        )
     }
 
     hideDialog() {
-        this.entryDialog = false;
+        this.patrimonyDialog = false;
         this.submitted = false;
+        this.patrimonyDialogUpdate = false;
     }
 
-    saveProduct() {
+
+    savePatrimony() {
         this.submitted = true;
 
-        if (this.entry.name?.trim()) {
-            if (this.entry.id) {
+
+        if (this.patrimony.name?.trim() && this.patrimony.category && this.patrimony.price && this.patrimony.data  ) {
+            if (this.patrimony.id) {
+                const patrimonyRequest: PatrimonyRequest = {
+                    category_id: +this.patrimony.category,
+                    data: this.patrimony.data,
+                    description: this.patrimony.description,
+                    name: this.patrimony.name,
+                    price: this.patrimony.price,
+                    type_id: this.type_id,
+                    user_id: this.user_id,
+                    id: this.patrimony.id,
+                    status: 1,
+                }
+
+                if(!this.patrimonyDialogUpdate){
+                    this.patrimonyService.update(patrimonyRequest).then(
+                        entrada => {
+                            const categoriaEncontrada = this.categoriasPatrimonios.find(categoria => categoria.id === +this.patrimony.category);
+
+                            if (categoriaEncontrada) {
+                            this.patrimony.category = categoriaEncontrada.name;
+                            }
+
+                            // @ts-ignore
+                            this.patrimonies[this.findIndexById(this.patrimony.id)] = entrada;
+                            this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Entry Updated', life: 1000 });
+                        });
+                }else{
+                    this.patrimonyService.updatePart(patrimonyRequest).then(
+                        entrada => {
+                            const categoriaEncontrada = this.categoriasPatrimonios.find(categoria => categoria.id === +this.patrimony.category);
+
+                            if (categoriaEncontrada) {
+                            this.patrimony.category = categoriaEncontrada.name;
+                            }
+
+                            // @ts-ignore
+                            this.patrimonies[this.findIndexById(this.patrimony.id)] = entrada;
+                            this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Entry Updated', life: 1000 });
+                        });
+                }
+
+
+                const categoriaEncontrada = this.categoriasPatrimonios.find(categoria => categoria.id === +this.patrimony.category);
+
+                if (categoriaEncontrada) {
+                this.patrimony.category = categoriaEncontrada.name;
+                }
+
                 // @ts-ignore
-                this.entries[this.findIndexById(this.entry.id)] = this.entry;
-                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Patrymony Updated', life: 3000 });
+                this.patrimonies[this.findIndexById(this.patrimony.id)] = this.patrimony;
+                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Entry Updated', life: 1000 });
+                this.sumPatrymonys();
             } else {
-                this.entry.id = this.createId();
+                const patrimonyRequest: PatrimonyRequest = {
+                    category_id: +this.patrimony.category,
+                    data: this.patrimony.data,
+                    description: this.patrimony.description,
+                    name: this.patrimony.name,
+                    price: this.patrimony.price,
+                    type_id: this.type_id,
+                    user_id: this.user_id,
+                    status:1,
+                }
+
+                this.patrimonyService.createPatrimony(patrimonyRequest).then(
+                    entrada => {
+                        this.patrimony.id = entrada.id;
+                        this.patrimonies.push(entrada);
+                        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Entry Created', life: 1000 });
+                        this.sumPatrymonys();
+                    }
+                )
+                // this.patrimony.id = this.createId();
                 // @ts-ignore
-                this.entries.push(this.entry);
-                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Patrymony Created', life: 3000 });
+
             }
 
-            this.entries = [...this.entries];
-            this.entryDialog = false;
-            this.entry = {};
+            this.patrimonies = [...this.patrimonies];
+            this.patrimonyDialog = false;
+            this.patrimonyDialogUpdate = false;
+            this.patrimony = {};
             this.sumPatrymonys();
 
         }
@@ -130,8 +327,8 @@ export class PatrymonyCrudComponent {
 
     findIndexById(id: string): number {
         let index = -1;
-        for (let i = 0; i < this.entries.length; i++) {
-            if (this.entries[i].id === id) {
+        for (let i = 0; i < this.patrimonies.length; i++) {
+            if (this.patrimonies[i].id === id) {
                 index = i;
                 break;
             }
@@ -155,9 +352,9 @@ export class PatrymonyCrudComponent {
 
     sumPatrymonys(): number {
         let total = 0;
-        for (const entry of this.entries) {
-          if (entry.price) {
-            total += entry.price;
+        for (const patrimony of this.patrimonies) {
+          if (patrimony.price) {
+            total += patrimony.price;
           }
         }
 
@@ -166,7 +363,7 @@ export class PatrymonyCrudComponent {
 
         // Emitir o total e as entradas para o componente pai
         this.totalPatrimoniesChanged.emit(total);
-        this.patrimoniesChanged.emit(this.entries);
+        this.patrimoniesChanged.emit(this.patrimonies);
 
         return total;
       }

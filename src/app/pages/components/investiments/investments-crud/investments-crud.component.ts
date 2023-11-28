@@ -1,8 +1,11 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
+import { Category } from 'src/app/pages/api/category';
 import { Investment } from 'src/app/pages/api/investment';
+import { MovementRequest } from 'src/app/pages/api/movement';
+import { PeriodSearch } from 'src/app/pages/api/patrimony';
 import { InvestmentService } from 'src/app/pages/service/investment.service';
 
 @Component({
@@ -10,16 +13,24 @@ import { InvestmentService } from 'src/app/pages/service/investment.service';
   templateUrl: './investments-crud.component.html',
   styleUrls: ['./investments-crud.component.scss']
 })
-export class InvestmentsCrudComponent {
+export class InvestmentsCrudComponent implements OnInit, OnChanges {
 
 
 
     @Output() totalInvestmentsChanged = new EventEmitter<number>();
     @Output() investmentsChanged = new EventEmitter<Investment[]>();
 
+    @Input() categorias: Category[];
+
+    @Input() busca: any;
+    @Input() type_id: number = 3;
+    @Input() user_id: string;
+
+    @Input() periodSearch: PeriodSearch;
+
     investmentDialog: boolean = false;
 
-    deleteProductDialog: boolean = false;
+    deleteInvestmentDialog: boolean = false;
 
     deleteInvestmentsDialog: boolean = false;
 
@@ -34,8 +45,8 @@ export class InvestmentsCrudComponent {
     cols: any[] = [];
 
 
+    categoriasInvestimentos: Category[];
 
-    categorias = ['CDI', 'CDB', 'IPCA+', 'Outros'];
     totalInvestments: number = 0;
     msgTotalInvestments: string = `Valor Total: R$ 0000,00`
 
@@ -53,16 +64,54 @@ export class InvestmentsCrudComponent {
             { field: 'category', header: 'Category' },
         ];
 
-       this.mockInvestments();
+       this.getInvestmentsForPeriod(this.periodSearch);
+
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['categorias']) {
+            this.filtraCategorias();
+          }
+
+        if (changes['periodSearch'] && !changes['periodSearch'].firstChange) {
+        // A propriedade periodSearch foi alterada, você pode realizar ações aqui
+        this.getInvestmentsForPeriod(this.periodSearch);
+        }
+    }
+
+    getInvestments() {
+        this.investmentService.getInvestments()
+        .then((investmentsValues: Investment[]) => {
+            this.investments.push(...investmentsValues);
+            this.sumInvestments();
+        }
+        )
+
+    }
+
+    getInvestmentsForPeriod(period: PeriodSearch) {
+        this.investmentService.getInvestmentsForPeriod(period)
+        .then((investmentsValues: Investment[]) => {
+            this.investments = investmentsValues;
+            this.sumInvestments();
+        }
+        )
+
+    }
+
+    filtraCategorias() {
+        if(this.categorias){
+            this.categoriasInvestimentos = this.categorias.filter(categoria => categoria.type_id === 3);
+        }
 
     }
 
     mockInvestments() {
        const mockInvestmentsValues: Investment[] = [
-            { "name": "PagSeguro", "category": "CDB", "price": 20000, "id": "1ZIta" },
-            { "name": "Nubank", "category": "CDI", "price": 5000, "id": "IEkO7" },
-            { "name": "Sofisa", "category": "Outros", "price": 15000, "id": "IEkO8" },
-            { "name": "99 Pay", "category": "IPCA+", "price": 1300, "id": "IEkO9" }
+            { "name": "PagSeguro", "data": new Date("2023-11-07T19:23:37.686Z"), "category": "CDB", "price": 20000, "id": "1ZIta" },
+            { "name": "Nubank", "data": new Date("2023-11-07T19:23:37.686Z"), "category": "CDI", "price": 5000, "id": "IEkO7" },
+            { "name": "Sofisa", "data": new Date("2023-11-07T19:23:37.686Z"), "category": "Investmentros", "price": 15000, "id": "IEkO8" },
+            { "name": "99 Pay", "data": new Date("2023-11-07T19:23:37.686Z"), "category": "IPCA+", "price": 1300, "id": "IEkO9" }
            ];
         this.investments.push(...mockInvestmentsValues);
         this.sumInvestments();
@@ -71,6 +120,7 @@ export class InvestmentsCrudComponent {
     openNew() {
         this.investment = {};
         this.submitted = false;
+        this.investment.data = new Date();
         this.investmentDialog = true;
     }
 
@@ -78,28 +128,66 @@ export class InvestmentsCrudComponent {
         this.deleteInvestmentsDialog = true;
     }
 
-    editProduct(investment: Investment) {
+    editInvestment(investment: Investment) {
+
+        const categoriaEncontrada = this.categoriasInvestimentos.find(categoria => categoria.name === investment.category);
+
+        if (categoriaEncontrada) {
+            investment.category = categoriaEncontrada.id.toString();
+        }
+
         this.investment = { ...investment };
         this.investmentDialog = true;
+
     }
 
-    deleteProduct(investment: Investment) {
-        this.deleteProductDialog = true;
+    deleteInvestment(investment: Investment) {
+        this.deleteInvestmentDialog = true;
         this.investment = { ...investment };
+        this.sumInvestments();
     }
 
     confirmDeleteSelected() {
         this.deleteInvestmentsDialog = false;
+
+        this.selectedInvestments.map(
+            (investment: Investment) => {
+                this.investmentService.delete(investment).then(
+                    investment => {
+                        this.investments = this.investments.filter(val => val.id !== this.investment.id);
+                        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Gasto Deleted', life: 3000 });
+                        this.investment = {};
+                        this.sumInvestments();
+                    }
+                ).catch(
+                    err => {
+                        this.messageService.add({ severity: 'danger', summary: 'Erro', detail: 'Erro na execução', life: 3000 });
+                    }
+                )
+            }
+        )
+
         this.investments = this.investments.filter(val => !this.selectedInvestments.includes(val));
         this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Investments Deleted', life: 3000 });
         this.selectedInvestments = [];
+        this.sumInvestments();
     }
 
     confirmDelete() {
-        this.deleteProductDialog = false;
-        this.investments = this.investments.filter(val => val.id !== this.investment.id);
-        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Investment Deleted', life: 3000 });
-        this.investment = {};
+        this.deleteInvestmentDialog = false;
+        this.investmentService.delete(this.investment).then(
+            investment => {
+                this.investments = this.investments.filter(val => val.id !== this.investment.id);
+                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Gasto Deleted', life: 3000 });
+                this.investment = {};
+                this.sumInvestments();
+            }
+        ).catch(
+            err => {
+                this.messageService.add({ severity: 'danger', summary: 'Erro', detail: 'Erro na execução', life: 3000 });
+            }
+        )
+
     }
 
     hideDialog() {
@@ -107,19 +195,69 @@ export class InvestmentsCrudComponent {
         this.submitted = false;
     }
 
-    saveProduct() {
+
+    saveInvestment() {
         this.submitted = true;
 
-        if (this.investment.name?.trim()) {
+
+        if (this.investment.name?.trim() && this.investment.category && this.investment.price && this.investment.data  ) {
             if (this.investment.id) {
+                const investmentRequest: MovementRequest = {
+                    category_id: +this.investment.category,
+                    data: this.investment.data,
+                    description: this.investment.description,
+                    name: this.investment.name,
+                    price: this.investment.price,
+                    type_id: this.type_id,
+                    user_id: this.user_id,
+                    id: this.investment.id,
+                }
+
+                this.investmentService.update(investmentRequest).then(
+                    entrada => {
+                        const categoriaEncontrada = this.categoriasInvestimentos.find(categoria => categoria.id === +this.investment.category);
+
+                        if (categoriaEncontrada) {
+                        this.investment.category = categoriaEncontrada.name;
+                        }
+
+                        // @ts-ignore
+                        this.investments[this.findIndexById(this.investment.id)] = entrada;
+                        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Entry Updated', life: 3000 });
+                    });
+
+                const categoriaEncontrada = this.categoriasInvestimentos.find(categoria => categoria.id === +this.investment.category);
+
+                if (categoriaEncontrada) {
+                this.investment.category = categoriaEncontrada.name;
+                }
+
                 // @ts-ignore
                 this.investments[this.findIndexById(this.investment.id)] = this.investment;
-                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Investment Updated', life: 3000 });
+                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Entry Updated', life: 3000 });
+                this.sumInvestments();
             } else {
-                this.investment.id = this.createId();
+                const investmentRequest: MovementRequest = {
+                    category_id: +this.investment.category,
+                    data: this.investment.data,
+                    description: this.investment.description,
+                    name: this.investment.name,
+                    price: this.investment.price,
+                    type_id: this.type_id,
+                    user_id: this.user_id,
+                }
+
+                this.investmentService.createInvestments(investmentRequest).then(
+                    entrada => {
+                        this.investment.id = entrada.id;
+                        this.investments.push(entrada);
+                        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Entry Created', life: 3000 });
+                        this.sumInvestments();
+                    }
+                )
+                // this.investment.id = this.createId();
                 // @ts-ignore
-                this.investments.push(this.investment);
-                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Investment Created', life: 3000 });
+
             }
 
             this.investments = [...this.investments];
@@ -129,6 +267,7 @@ export class InvestmentsCrudComponent {
 
         }
     }
+
 
     findIndexById(id: string): number {
         let index = -1;
