@@ -40,7 +40,6 @@ export class UsersSettingsListComponent implements OnInit, OnDestroy {
       switchMap((user: User) => this.userService.findUser(user.id))
     ).subscribe(
       (userDetail: User) => {
-        console.log('Meu usuário detalhado: ', userDetail);
         this.loggedInUser = userDetail;
       }
     );

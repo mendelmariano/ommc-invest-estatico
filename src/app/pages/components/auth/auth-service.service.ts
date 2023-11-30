@@ -117,7 +117,6 @@ export class AuthServiceService {
             }),
             catchError((error) => {
                 const credential = GoogleAuthProvider.credentialFromError(error);
-                console.log('Erro: ', credential);
                 // Handle the error or return an appropriate error response
                 // Adjust this part as needed
                 throw new Error('Google login error');

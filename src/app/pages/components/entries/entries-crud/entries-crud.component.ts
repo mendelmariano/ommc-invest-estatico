@@ -292,14 +292,10 @@ export class EntriesCrudComponent implements OnInit, OnChanges {
     }
 
     sumEntries(): number {
-        console.log('Entrou na soma', this.entries);
         let total = 0;
         for (const entry of this.entries) {
-            console.log('Entrada: ', entry);
           if (entry.price) {
-            console.log('Entrou no if soma', entry);
             total += entry.price;
-            console.log('Total após esta iteração:', total);
           }
         }
 
