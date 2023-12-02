@@ -94,33 +94,64 @@
 
                 <div class="col-12 md:col-12" >
                     <p-fieldset legend="Gráficos" [toggleable]="true" class="line-height-3 m-0">
+                        <p-tabView orientation="left">
+                            <p-tabPanel header="Visão geral" class="line-height-3 m-0">
+                                <div class="card">
+                                    <div class="flex justify-content-between flex-wrap ">
+                                            <div class="m-2" *ngIf="patrymoniesDataGraph.labels.length">
 
-                            <div class="card">
-                                <div class="flex justify-content-between flex-wrap ">
-                                        <div class="m-2" *ngIf="patrymoniesDataGraph.labels.length">
+                                                <h3 class="text-left">Patrimônio atual <b>{{ ' - ' + planForm.get('namePlan').value }}</b></h3>
+                                                <p-chart type="doughnut" [data]="patrymoniesDataGraph" [options]="patrymoniesDataOpt"></p-chart>
 
-                                            <h3 class="text-left">Patrimônio atual <b>{{ ' - ' + planForm.get('namePlan').value }}</b></h3>
-                                            <p-chart type="doughnut" [data]="patrymoniesDataGraph" [options]="patrymoniesDataOpt"></p-chart>
+                                                <button pButton type="button"
+                                                    label="{{ showPatrymoniesPercentages ? '| Exibir Valores' : '| Exibir Percentuais %' }}"
+                                                    (click)="togglePatrymoniesPercentages()"
+                                                    [ngClass]="{'p-button-success m-2': showPatrymoniesPercentages, 'p-button-info m-2': !showPatrymoniesPercentages}">
+                                                </button>
+                                            </div>
 
-                                            <button pButton type="button"
-                                                label="{{ showPatrymoniesPercentages ? 'Exibir Valores' : 'Exibir Percentuais %' }}"
-                                                (click)="togglePatrymoniesPercentages()"
+                                            <div class="m-2" *ngIf="pieDataGeneral.labels.length">
+                                                    <h3 class="text-left ">Receitas e gastos <b>{{ ' - ' + planForm.get('namePlan').value }}</b></h3>
+                                                    <p-chart type="bar" [data]="pieDataGeneral" [options]="pieOptionsGeneral"></p-chart>
+                                            </div>
+
+                                            <div class="m-2" *ngIf="gastosData.labels.length">
+                                                <h3 class="text-left"> <b> Meus gastos </b></h3>
+                                                <p-chart type="pie" [data]="gastosData" [options]="gastosGraphOpt"></p-chart>
+                                                <button pButton type="button"
+                                                label="{{ showGastosPercentages ? '| Exibir Valores' : '| Exibir Percentuais %' }}"
+                                                (click)="toggleGastosPercentages()"
                                                 [ngClass]="{'p-button-success m-2': showPatrymoniesPercentages, 'p-button-info m-2': !showPatrymoniesPercentages}">
                                             </button>
-                                        </div>
+                                            </div>
 
-                                        <div class="m-2" *ngIf="pieDataGeneral.labels.length">
-                                                <h3 class="text-left ">Receitas e gastos <b>{{ ' - ' + planForm.get('namePlan').value }}</b></h3>
-                                                <p-chart type="bar" [data]="pieDataGeneral" [options]="pieOptionsGeneral"></p-chart>
-                                        </div>
-
-                                        <div class="m-2" *ngIf="gastosData.labels.length">
-                                            <h3 class="text-left"> <b> Meus gastos </b></h3>
-                                            <p-chart type="pie" [data]="gastosData" [options]="gastosGraphOpt"></p-chart>
-                                        </div>
-
+                                    </div>
                                 </div>
-                            </div>
+
+                            </p-tabPanel>
+
+                            <p-tabPanel header="Receitas Detalhadas" class="line-height-3 m-0">
+
+                                <div class="card">
+                                    <div class="flex justify-content-between flex-wrap ">
+                                        <div class="m-2" *ngIf="receitasDataGeneral.labels.length">
+                                            <h3 class="text-left ">Receitas e gastos <b>{{ ' - ' + planForm.get('namePlan').value }}</b></h3>
+                                            <p-chart type="bar" [data]="receitasDataGeneral" [options]="receitasOptionsGeneral"></p-chart>
+
+                                            <button pButton type="button"
+                                            label="{{ exibirReceitasEmPercentual ? '| Exibir Valores' : '| Exibir Percentuais %' }}"
+                                            [ngClass]="{'p-button-success m-2': exibirReceitasEmPercentual, 'p-button-info m-2': !exibirReceitasEmPercentual}"
+                                            (click)="toggleExibirReceitasEmPercentual()">Alternar Modo |  </button>
+                                    </div>
+
+
+                                    </div>
+                                </div>
+
+                            </p-tabPanel>
+
+                        </p-tabView>
+
                     </p-fieldset>
                 </div>
 

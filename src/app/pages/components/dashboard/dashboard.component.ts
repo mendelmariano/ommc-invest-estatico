@@ -27,6 +27,9 @@ export class DashboardComponent implements OnInit {
     pieDataGeneral: any;
     pieOptionsGeneral: any;
 
+    receitasDataGeneral: any;
+    receitasOptionsGeneral: any;
+
 
     gastosData: any;
     gastosGraphOpt: any;
@@ -51,7 +54,11 @@ export class DashboardComponent implements OnInit {
     categorias: Category[] = [];
     user_id: string;
 
+    exibirReceitasEmPercentual = true;
+
     showPatrymoniesPercentages: boolean = false;
+
+    showGastosPercentages: boolean = false;
 
     constructor(private messageService: MessageService,
                 public layoutService: LayoutService,
@@ -78,6 +85,7 @@ export class DashboardComponent implements OnInit {
         this.mockDatas();
         this.initCategories();
         this.updateGastosChart();
+        this.updateReceitasChart();
 
         this.authService.getUser().subscribe(
             user => this.user_id = user.id
@@ -113,11 +121,13 @@ export class DashboardComponent implements OnInit {
     onTotalEntriesChanged(total: number) {
         this.totalEntries = total;
         this.updatePieChart();
+        this.updateReceitasChart();
     }
 
     onEntriesChanged(entries: Entry[]) {
         this.entries = entries;
         this.updatePieChart();
+        this.updateReceitasChart();
     }
 
     onTotalPatrymoniesChanged(total: number) {
@@ -150,7 +160,6 @@ export class DashboardComponent implements OnInit {
     }
 
     onOutsChanged(outs: Out[]) {
-        console.log('Gastos alterados: ', outs);
         this.outs = outs;
         this.updatePieChart();
         this.updateGastosChart();
@@ -159,6 +168,11 @@ export class DashboardComponent implements OnInit {
     togglePatrymoniesPercentages() {
         this.showPatrymoniesPercentages = !this.showPatrymoniesPercentages;
         this.updateGraphPatrymonies();
+      }
+
+    toggleGastosPercentages() {
+        this.showGastosPercentages = !this.showGastosPercentages;
+        this.updateGastosChart();
       }
 
     initMenuNew() {
@@ -227,7 +241,16 @@ export class DashboardComponent implements OnInit {
               labels: {
                 color: textColor
               }
-            }
+            },
+            tooltip: {
+                callbacks: {
+                  label: (context) => {
+                    const label = context.label || '';
+                    const value = context.parsed;
+                    return this.showPatrymoniesPercentages ? `${label}: ${value.toFixed(2)}%` : this.formatarParaReais(Number(value));
+                  },
+                },
+              },
           }
         };
       }
@@ -248,6 +271,34 @@ export class DashboardComponent implements OnInit {
 
         return categoryValues;
       }
+
+      calculateCategoryPercentages(data) {
+        const categoryPercentages = {};
+        let total = 0;
+
+        // Calcular o total dos preços
+        data.forEach(item => {
+          total += item.price;
+        });
+
+        // Calcular as porcentagens para cada categoria
+        data.forEach(item => {
+          const category = item.category;
+          const price = item.price;
+
+          const percentage = (price / total) * 100;
+
+          if (categoryPercentages[category]) {
+            categoryPercentages[category] += percentage;
+          } else {
+            categoryPercentages[category] = percentage;
+          }
+        });
+
+        return categoryPercentages;
+      }
+
+
 
       getUniqueCategoriesAndSum(expenses: Out[]) {
         const sumByCategory: Record<string, number> = {};
@@ -272,15 +323,18 @@ export class DashboardComponent implements OnInit {
         const documentStyle = getComputedStyle(document.documentElement);
         const textColor = documentStyle.getPropertyValue('--text-color');
 
-        const gastos = this.getUniqueCategoriesAndSum(this.outs);
+        const gastos =
+        this.showGastosPercentages ? this.calculateCategoryPercentages(this.outs) : this.calculateCategoryValues(this.outs)
+       //  this.getUniqueCategoriesAndSum(this.outs);
 
-        console.log('Meus gastos: ', gastos);
+       const labels = Object.keys(gastos);
+        const data = Object.values(gastos);
 
         this.gastosData = {
-            labels: gastos.labels,
+            labels: labels,
             datasets: [
                 {
-                    data: gastos.values,
+                    data: data,
                     backgroundColor: [
                         documentStyle.getPropertyValue('--indigo-500'),
                         documentStyle.getPropertyValue('--purple-500'),
@@ -301,7 +355,16 @@ export class DashboardComponent implements OnInit {
                         usePointStyle: true,
                         color: textColor
                     }
-                }
+                },
+            tooltip: {
+                callbacks: {
+                    label: (context) => {
+                    const label = context.label || '';
+                    const value = context.parsed;
+                    return this.showGastosPercentages ? `${label}: ${value.toFixed(2)}%` : this.formatarParaReais(Number(value));
+                    },
+                },
+                },
             }
         };
       }
@@ -327,12 +390,24 @@ export class DashboardComponent implements OnInit {
             ]
         };
 
-        this.pieOptionsGeneral = { plugins: {
+        this.pieOptionsGeneral = {
+
+        plugins: {
             legend: {
                 labels: {
                     color: textColor
                 }
-            }
+            },
+            tooltip: {
+                callbacks: {
+                  label: (context) => {
+                    const label = context.dataset.label || '';
+                    const value = context.parsed.y;
+                    return this.formatarParaReais(Number(value));
+                  },
+                },
+              },
+
         },
         scales: {
             y: {
@@ -358,6 +433,93 @@ export class DashboardComponent implements OnInit {
         };
         this.updateGraphPatrymonies();
     }
+
+    updateReceitasChart() {
+
+
+
+        const documentStyle = getComputedStyle(document.documentElement);
+        const textColor = documentStyle.getPropertyValue('--text-color');
+        const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
+        const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+
+
+
+        const dadosGrafico = this.exibirReceitasEmPercentual
+        ? this.calculateCategoryPercentages(this.entries)
+        : this.calculateCategoryValues(this.entries);
+
+        const labels = Object.keys(dadosGrafico);
+        const data = Object.values(dadosGrafico);
+
+        this.receitasDataGeneral = {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Minhas Receitas',
+                    data: data,
+                    backgroundColor: [ 'rgba(75, 192, 192, 0.2)', 'rgba(255, 50, 0, 0.2)', 'rgba(255, 215, 0, 0.2)'],
+                    borderColor: ['rgb(255, 159, 64)', 'rgb(75, 192, 192)', 'rgb(255, 215, 0)'],
+                    borderWidth: 1
+                }
+            ]
+        };
+
+        this.receitasOptionsGeneral = {
+
+            plugins: {
+            legend: {
+                labels: {
+                    color: textColor
+                }
+            },
+            tooltip: {
+                callbacks: {
+                  label: (context) => {
+                    const label = context.dataset.label || '';
+                    const value = context.parsed.y;
+                    return this.exibirReceitasEmPercentual ? `${label}: ${value.toFixed(2)}%` : this.formatarParaReais(Number(value));
+                  },
+                },
+              },
+
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    color: textColorSecondary,
+                    callback: (value) => this.exibirReceitasEmPercentual ? `${value}%` : value,
+
+                },
+                grid: {
+                    color: surfaceBorder,
+                    drawBorder: false
+                }
+            },
+            x: {
+                ticks: {
+                    color: textColorSecondary
+                },
+                grid: {
+                    color: surfaceBorder,
+                    drawBorder: false
+                }
+            }
+        }
+        };
+        this.updateGraphPatrymonies();
+    }
+
+    formatarParaReais(valor: number): string {
+        const formatoReais = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+        return formatoReais.format(valor);
+      }
+
+    toggleExibirReceitasEmPercentual() {
+        this.exibirReceitasEmPercentual = !this.exibirReceitasEmPercentual;
+        this.updateReceitasChart();
+      }
 
     salvarPeriodo() {
         this.visiblePeriodPlan = false;

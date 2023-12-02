@@ -25,6 +25,7 @@ import { OutsModule } from '../outs/outs.module';
 import { InvestimentsModule } from '../investiments/investiments.module';
 import { PatrymonyModule } from '../patrymony/patrymony.module';
 import { CategoryService } from '../../service/category.service';
+import { TabViewModule } from 'primeng/tabview';
 
 @NgModule({
     imports: [
@@ -52,6 +53,7 @@ import { CategoryService } from '../../service/category.service';
         OutsModule,
         InvestimentsModule,
         PatrymonyModule,
+        TabViewModule,
     ],
     declarations: [DashboardComponent],
     providers: [MessageService, CategoryService]
