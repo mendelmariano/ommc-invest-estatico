@@ -189,32 +189,42 @@
                         </app-outs-crud>
 
                     </div>
+                </div>
 
-                    <div class="col-12 md:col-6">
-                        <app-investments-crud
-                            (totalInvestmentsChanged)="onTotalInvestmentsChanged($event)"
-                            (investmentsChanged)="onInvestmentsChanged($event)"
-                            [categorias]="categorias"
-                            [user_id]="user_id"
-                            [periodSearch]="periodSearch"
-                        >
+                <div class="grid">
+                        <p-tabView orientation="left">
+                            <p-tabPanel header="Investimentos" class="line-height-3 m-0">
+                                <div class="col-12 md:col-12">
+                                    <app-investments-crud
+                                        (totalInvestmentsChanged)="onTotalInvestmentsChanged($event)"
+                                        (investmentsChanged)="onInvestmentsChanged($event)"
+                                        [categorias]="categorias"
+                                        [user_id]="user_id"
+                                        [periodSearch]="periodSearch"
+                                    >
 
-                        </app-investments-crud>
+                                    </app-investments-crud>
 
-                    </div>
+                                </div>
 
-                    <div class="col-12 md:col-6">
-                        <app-patrymony-crud
-                        (totalPatrimoniesChanged)="onTotalPatrymoniesChanged($event)"
-                            (patrimoniesChanged)="onPatrymoniesChanged($event)"
-                            [categorias]="categorias"
-                            [user_id]="user_id"
-                            [periodSearch]="periodSearch"
-                        >
 
-                        </app-patrymony-crud>
+                            </p-tabPanel>
 
-                    </div>
+                            <p-tabPanel header="Meu patrimônio" class="line-height-3 m-0">
+                                <div class="col-12 md:col-12">
+                                    <app-patrymony-crud
+                                    (totalPatrimoniesChanged)="onTotalPatrymoniesChanged($event)"
+                                        (patrimoniesChanged)="onPatrymoniesChanged($event)"
+                                        [categorias]="categorias"
+                                        [user_id]="user_id"
+                                        [periodSearch]="periodSearch"
+                                    >
+
+                                    </app-patrymony-crud>
+                                </div>
+                            </p-tabPanel>
+
+                        </p-tabView>
                 </div>
 
             </p-fieldset>
