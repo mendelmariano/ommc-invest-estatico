@@ -12,6 +12,7 @@ import { Category } from '../../api/category';
 import { UsersService } from '../users/users.service';
 import { AuthServiceService } from '../auth/auth-service.service';
 import { PeriodSearch } from '../../api/patrimony';
+import { PatrymonyService } from '../../service/patrymony.service';
 
 @Component({
   templateUrl: './dashboard.component.html',
@@ -29,6 +30,15 @@ export class DashboardComponent implements OnInit {
 
     receitasDataGeneral: any;
     receitasOptionsGeneral: any;
+
+
+    patrimoniosDataMensal: any;
+    patrimoniosoptionsMensal: any;
+
+    patrimoniosLabelMensal: any[] = [];
+    patrimoniosValuesMensal: any[] = [];
+
+    dadosPatrimoniosMensal: any = {};
 
 
     gastosData: any;
@@ -65,6 +75,7 @@ export class DashboardComponent implements OnInit {
                 private fb: FormBuilder,
                 private categoryService: CategoryService,
                 private authService: AuthServiceService,
+                private patrymonyService: PatrymonyService,
                 ) {
         this.planForm = this.fb.group({
             startDate: ['', Validators.required],
@@ -86,6 +97,8 @@ export class DashboardComponent implements OnInit {
         this.initCategories();
         this.updateGastosChart();
         this.updateReceitasChart();
+        this.initValuesPatrimoniesForMounth();
+        this.updatePatrimonioMensalChart();
 
         this.authService.getUser().subscribe(
             user => this.user_id = user.id
@@ -100,6 +113,22 @@ export class DashboardComponent implements OnInit {
             })
             .catch(error => {
                 console.error("Erro ao obter categorias:", error);
+                // Trate o erro conforme necessário
+            });
+    }
+
+    initValuesPatrimoniesForMounth() {
+      this.patrymonyService.getPatromoniesForMounth()
+            .then((data: any) => {
+                for (const [key, value] of Object.entries(data)) {
+                  this.patrimoniosLabelMensal.push(key)
+                  this.patrimoniosValuesMensal.push(+value);
+              }
+
+              this.updatePatrimonioMensalChart();
+            })
+            .catch(error => {
+                console.error("Erro ao obter dados mensais de patrimonio:", error);
                 // Trate o erro conforme necessário
             });
     }
@@ -510,6 +539,67 @@ export class DashboardComponent implements OnInit {
         };
         this.updateGraphPatrymonies();
     }
+
+    updatePatrimonioMensalChart() {
+
+
+      const documentStyle = getComputedStyle(document.documentElement);
+      const textColor = documentStyle.getPropertyValue('--text-color');
+      const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
+      const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+
+
+      const labels = Object.keys(this.dadosPatrimoniosMensal);
+      const data = Object.values(this.dadosPatrimoniosMensal);
+
+
+      this.patrimoniosDataMensal ={
+        labels: this.patrimoniosLabelMensal,
+        datasets: [
+            {
+                label: 'Seu patrimonio nos meses',
+                data: this.patrimoniosValuesMensal,
+                fill: false,
+                backgroundColor: documentStyle.getPropertyValue('--primary-500'),
+                borderColor: documentStyle.getPropertyValue('--primary-500'),
+                tension: .4
+            }
+        ]
+    };
+
+
+    this.patrimoniosoptionsMensal = {
+      plugins: {
+          legend: {
+              labels: {
+                  fontColor: textColor
+              }
+          }
+      },
+      scales: {
+          x: {
+              ticks: {
+                  color: textColorSecondary
+              },
+              grid: {
+                  color: surfaceBorder,
+                  drawBorder: false
+              }
+          },
+          y: {
+              ticks: {
+                  color: textColorSecondary
+              },
+              grid: {
+                  color: surfaceBorder,
+                  drawBorder: false
+              }
+          },
+      }
+  };
+
+      this.updateGraphPatrymonies();
+  }
 
     formatarParaReais(valor: number): string {
         const formatoReais = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });

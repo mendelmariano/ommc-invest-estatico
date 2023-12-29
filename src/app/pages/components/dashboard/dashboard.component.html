@@ -1,303 +1,306 @@
-    <p-toast></p-toast>
+<p-toast></p-toast>
 
-    <div class="col-12 lg-12 xl-12">
-        <div class="grid">
+<div class="col-12 lg-12 xl-12">
+    <div class="grid">
+
+        <div class="col-12 md:col-12">
+            <div class="card">
+                <h1>Inicie seu planejamento!</h1>
+
+                <button pButton pRipple label="Buscar Período" (click)="visiblePeriodPlan = true" icon="pi pi-search" class="p-button-rounded p-button-success"></button>
+
+
+              </div>
+
+        </div>
+
 
             <div class="col-12 md:col-12">
-                <div class="card">
-                    <h1>Inicie seu planejamento!</h1>
-                   <!--  <div class="p-toolbar-group-right m-4">
-                      <p-speedDial [model]="items" direction="right" [radius]="80" ></p-speedDial>
-                    </div> -->
-
-                    <button pButton pRipple label="Buscar Período" (click)="visiblePeriodPlan = true" icon="pi pi-search" class="p-button-rounded p-button-success"></button>
+                <p-fieldset legend="Estatísticas" [toggleable]="true" class="line-height-3 m-0">
+                <p-toolbar>
+                    <div class="p-toolbar-group-start d-flex flex-column">
 
 
-                  </div>
+                        <!-- O segundo card ficará automaticamente abaixo do primeiro -->
+                        <div class="flex align-items-center justify-content-start m-2">
+                          <div class="flex-1 card m-1 bg-primary font-bold text-center">
+                            <h4>Receita: </h4> {{ totalEntries | currency: 'BRL' }}
+                          </div>
 
+                          <div class="flex-1 card m-1 font-bold text-center"
+                          [ngStyle]="{backgroundColor:'var(--red-400)',
+                                      color: 'var(--primary-color-text)',
+                                      borderRadius: 'var(--border-radius)',
+                                      }"
+                          >
+                            <h4>Despesas: </h4> {{ totalOuts | currency: 'BRL' }}
+                          </div>
+
+                          <div class="flex-1 card m-1 font-bold text-center"
+                          [ngStyle]="{backgroundColor:'var(--yellow-400)',
+                                      color: 'var(--primary-color-text)',
+                                      borderRadius: 'var(--border-radius)',
+                                      }"
+                          >
+                            <h4>Invest.: </h4> {{ totalInvestments | currency: 'BRL' }}
+                          </div>
+
+
+                            <div class="flex-1 card m-1 font-bold text-center"
+                            [ngStyle]="{
+                                backgroundColor: totalEntries > totalOuts ? 'var(--green-400)' : totalEntries === totalOuts ? 'var(--yellow-400)' : 'var(--red-400)',
+                                color: 'var(--primary-color-text)',
+                                borderRadius: 'var(--border-radius)'
+                             }"
+                          >
+                            <h3>Posição do perído: </h3> {{ totalEntries - totalOuts | currency: 'BRL' }}
+                          </div>
+
+                          <div class="flex-1 card m-1 font-bold text-center"
+                            [ngStyle]="{
+                                backgroundColor: 'var(--primary-color)',
+                                color: 'var(--primary-color-text)',
+                                borderRadius: 'var(--border-radius)'
+                            }"
+                            >
+                                <h5>Percentual de gastos: </h5> {{ (totalOuts / totalEntries * 100) | number:'1.2-2' }}%
+                            </div>
+
+                            <div class="flex-1 card m-1 font-bold text-center"
+                            [ngStyle]="{
+                                backgroundColor: 'var(--primary-color)',
+                                color: 'var(--primary-color-text)',
+                                borderRadius: 'var(--border-radius)'
+                            }"
+                            >
+                                <h5>Patrimônio acumulado no período: </h5> {{ totalPatrymonies | currency: 'BRL'}}
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                  </p-toolbar>
+                </p-fieldset>
             </div>
 
 
-                <div class="col-12 md:col-12">
-                    <p-fieldset legend="Estatísticas" [toggleable]="true" class="line-height-3 m-0">
-                    <p-toolbar>
-                        <div class="p-toolbar-group-start d-flex flex-column">
 
 
-                            <!-- O segundo card ficará automaticamente abaixo do primeiro -->
-                            <div class="flex align-items-center justify-content-start m-2">
-                              <div class="flex-1 card m-1 bg-primary font-bold text-center">
-                                <h4>Receita: </h4> {{ totalEntries | currency: 'BRL' }}
-                              </div>
-
-                              <div class="flex-1 card m-1 font-bold text-center"
-                              [ngStyle]="{backgroundColor:'var(--red-400)',
-                                          color: 'var(--primary-color-text)',
-                                          borderRadius: 'var(--border-radius)',
-                                          }"
-                              >
-                                <h4>Despesas: </h4> {{ totalOuts | currency: 'BRL' }}
-                              </div>
-
-                              <div class="flex-1 card m-1 font-bold text-center"
-                              [ngStyle]="{backgroundColor:'var(--yellow-400)',
-                                          color: 'var(--primary-color-text)',
-                                          borderRadius: 'var(--border-radius)',
-                                          }"
-                              >
-                                <h4>Invest.: </h4> {{ totalInvestments | currency: 'BRL' }}
-                              </div>
 
 
-                                <div class="flex-1 card m-1 font-bold text-center"
-                                [ngStyle]="{
-                                    backgroundColor: totalEntries > totalOuts ? 'var(--green-400)' : totalEntries === totalOuts ? 'var(--yellow-400)' : 'var(--red-400)',
-                                    color: 'var(--primary-color-text)',
-                                    borderRadius: 'var(--border-radius)'
-                                 }"
-                              >
-                                <h3>Posição do perído: </h3> {{ totalEntries - totalOuts | currency: 'BRL' }}
-                              </div>
+            <div class="col-12 md:col-12" >
+                <p-fieldset legend="Gráficos" [toggleable]="true" class="line-height-3 m-0">
+                    <p-tabView orientation="left">
+                        <p-tabPanel header="Visão geral" class="line-height-3 m-0">
+                            <div class="card">
+                                <div class="flex justify-content-between flex-wrap ">
+                                        <div class="m-2" *ngIf="patrymoniesDataGraph.labels.length">
 
-                              <div class="flex-1 card m-1 font-bold text-center"
-                                [ngStyle]="{
-                                    backgroundColor: 'var(--primary-color)',
-                                    color: 'var(--primary-color-text)',
-                                    borderRadius: 'var(--border-radius)'
-                                }"
-                                >
-                                    <h5>Percentual de gastos: </h5> {{ (totalOuts / totalEntries * 100) | number:'1.2-2' }}%
-                                </div>
+                                            <h3 class="text-left">Patrimônio atual <b>{{ ' - ' + planForm.get('namePlan').value }}</b></h3>
+                                            <p-chart type="doughnut" [data]="patrymoniesDataGraph" [options]="patrymoniesDataOpt"></p-chart>
 
-                                <div class="flex-1 card m-1 font-bold text-center"
-                                [ngStyle]="{
-                                    backgroundColor: 'var(--primary-color)',
-                                    color: 'var(--primary-color-text)',
-                                    borderRadius: 'var(--border-radius)'
-                                }"
-                                >
-                                    <h5>Patrimônio acumulado no período: </h5> {{ totalPatrymonies | currency: 'BRL'}}
+                                            <button pButton type="button"
+                                                label="{{ showPatrymoniesPercentages ? '| Exibir Valores' : '| Exibir Percentuais %' }}"
+                                                (click)="togglePatrymoniesPercentages()"
+                                                [ngClass]="{'p-button-success m-2': showPatrymoniesPercentages, 'p-button-info m-2': !showPatrymoniesPercentages}">
+                                            </button>
+                                        </div>
+
+                                        <div class="m-2" *ngIf="pieDataGeneral.labels.length">
+                                                <h3 class="text-left ">Receitas e gastos <b>{{ ' - ' + planForm.get('namePlan').value }}</b></h3>
+                                                <p-chart type="bar" [data]="pieDataGeneral" [options]="pieOptionsGeneral"></p-chart>
+                                        </div>
+
+                                        <div class="m-2" *ngIf="gastosData.labels.length">
+                                            <h3 class="text-left"> <b> Meus gastos </b></h3>
+                                            <p-chart type="pie" [data]="gastosData" [options]="gastosGraphOpt"></p-chart>
+                                            <button pButton type="button"
+                                            label="{{ showGastosPercentages ? '| Exibir Valores' : '| Exibir Percentuais %' }}"
+                                            (click)="toggleGastosPercentages()"
+                                            [ngClass]="{'p-button-success m-2': showPatrymoniesPercentages, 'p-button-info m-2': !showPatrymoniesPercentages}">
+                                        </button>
+                                        </div>
+
                                 </div>
                             </div>
 
+                        </p-tabPanel>
 
+                        <p-tabPanel header="Receitas Detalhadas" class="line-height-3 m-0">
 
-                        </div>
-                      </p-toolbar>
-                    </p-fieldset>
-                </div>
+                            <div class="card">
+                                <div class="flex justify-content-between flex-wrap ">
+                                    <div class="m-2" *ngIf="receitasDataGeneral.labels.length">
+                                        <h3 class="text-left ">Receitas e gastos <b>{{ ' - ' + planForm.get('namePlan').value }}</b></h3>
+                                        <p-chart type="bar" [data]="receitasDataGeneral" [options]="receitasOptionsGeneral"></p-chart>
 
-
-
-
-
-
-                <div class="col-12 md:col-12" >
-                    <p-fieldset legend="Gráficos" [toggleable]="true" class="line-height-3 m-0">
-                        <p-tabView orientation="left">
-                            <p-tabPanel header="Visão geral" class="line-height-3 m-0">
-                                <div class="card">
-                                    <div class="flex justify-content-between flex-wrap ">
-                                            <div class="m-2" *ngIf="patrymoniesDataGraph.labels.length">
-
-                                                <h3 class="text-left">Patrimônio atual <b>{{ ' - ' + planForm.get('namePlan').value }}</b></h3>
-                                                <p-chart type="doughnut" [data]="patrymoniesDataGraph" [options]="patrymoniesDataOpt"></p-chart>
-
-                                                <button pButton type="button"
-                                                    label="{{ showPatrymoniesPercentages ? '| Exibir Valores' : '| Exibir Percentuais %' }}"
-                                                    (click)="togglePatrymoniesPercentages()"
-                                                    [ngClass]="{'p-button-success m-2': showPatrymoniesPercentages, 'p-button-info m-2': !showPatrymoniesPercentages}">
-                                                </button>
-                                            </div>
-
-                                            <div class="m-2" *ngIf="pieDataGeneral.labels.length">
-                                                    <h3 class="text-left ">Receitas e gastos <b>{{ ' - ' + planForm.get('namePlan').value }}</b></h3>
-                                                    <p-chart type="bar" [data]="pieDataGeneral" [options]="pieOptionsGeneral"></p-chart>
-                                            </div>
-
-                                            <div class="m-2" *ngIf="gastosData.labels.length">
-                                                <h3 class="text-left"> <b> Meus gastos </b></h3>
-                                                <p-chart type="pie" [data]="gastosData" [options]="gastosGraphOpt"></p-chart>
-                                                <button pButton type="button"
-                                                label="{{ showGastosPercentages ? '| Exibir Valores' : '| Exibir Percentuais %' }}"
-                                                (click)="toggleGastosPercentages()"
-                                                [ngClass]="{'p-button-success m-2': showPatrymoniesPercentages, 'p-button-info m-2': !showPatrymoniesPercentages}">
-                                            </button>
-                                            </div>
-
-                                    </div>
+                                        <button pButton type="button"
+                                        label="{{ exibirReceitasEmPercentual ? '| Exibir Valores' : '| Exibir Percentuais %' }}"
+                                        [ngClass]="{'p-button-success m-2': exibirReceitasEmPercentual, 'p-button-info m-2': !exibirReceitasEmPercentual}"
+                                        (click)="toggleExibirReceitasEmPercentual()">Alternar Modo |  </button>
                                 </div>
 
-                            </p-tabPanel>
 
-                            <p-tabPanel header="Receitas Detalhadas" class="line-height-3 m-0">
-
-                                <div class="card">
-                                    <div class="flex justify-content-between flex-wrap ">
-                                        <div class="m-2" *ngIf="receitasDataGeneral.labels.length">
-                                            <h3 class="text-left ">Receitas e gastos <b>{{ ' - ' + planForm.get('namePlan').value }}</b></h3>
-                                            <p-chart type="bar" [data]="receitasDataGeneral" [options]="receitasOptionsGeneral"></p-chart>
-
-                                            <button pButton type="button"
-                                            label="{{ exibirReceitasEmPercentual ? '| Exibir Valores' : '| Exibir Percentuais %' }}"
-                                            [ngClass]="{'p-button-success m-2': exibirReceitasEmPercentual, 'p-button-info m-2': !exibirReceitasEmPercentual}"
-                                            (click)="toggleExibirReceitasEmPercentual()">Alternar Modo |  </button>
-                                    </div>
-
-
-                                    </div>
                                 </div>
+                            </div>
 
-                            </p-tabPanel>
+                        </p-tabPanel>
 
-                        </p-tabView>
+                        <p-tabPanel header="Progressão de Patrimônio" class="line-height-3 m-0">
 
-                    </p-fieldset>
-                </div>
+                            <div class="card">
+                                <div class="flex justify-content-between flex-wrap ">
+                                    <div class="m-2" *ngIf="patrymoniesDataGraph.labels.length">
+                                        <h3 class="text-left ">Receitas e gastos <b>{{ ' - ' + planForm.get('namePlan').value }}</b></h3>
+                                        <p-chart type="line" [data]="patrimoniosDataMensal" [options]="patrimoniosoptionsMensal"></p-chart>
 
-
-
-        </div>
-
-
-
-
-        <div class="grid mt-3" >
-            <!-- <div class="grid mt-3" > -->
-            <p-fieldset [legend]="plan.namePlan" [toggleable]="true" class="line-height-3 m-0">
-                <div class="grid">
-                    <div class="col-12 md:col-6">
-                        <app-entries-crud
-                            (totalEntriesChanged)="onTotalEntriesChanged($event)"
-                            (entriesChanged)="onEntriesChanged($event)"
-                            [categorias]="categorias"
-                            [user_id]="user_id"
-                            [periodSearch]="periodSearch"
-                            >
-                        </app-entries-crud>
-
-                    </div>
-
-                    <div class="col-12 md:col-6">
-                        <app-outs-crud
-                            (totalOutsChanged)="onTotalOutsChanged($event)"
-                            (outsChanged)="onOutsChanged($event)"
-                            [categorias]="categorias"
-                            [user_id]="user_id"
-                            [periodSearch]="periodSearch"
-                            >
-                        </app-outs-crud>
-
-                    </div>
-                </div>
-
-                <div class="grid">
-                        <p-tabView orientation="left">
-                            <p-tabPanel header="Investimentos" class="line-height-3 m-0">
-                                <div class="col-12 md:col-12">
-                                    <app-investments-crud
-                                        (totalInvestmentsChanged)="onTotalInvestmentsChanged($event)"
-                                        (investmentsChanged)="onInvestmentsChanged($event)"
-                                        [categorias]="categorias"
-                                        [user_id]="user_id"
-                                        [periodSearch]="periodSearch"
-                                    >
-
-                                    </app-investments-crud>
 
                                 </div>
 
 
-                            </p-tabPanel>
-
-                            <p-tabPanel header="Meu patrimônio" class="line-height-3 m-0">
-                                <div class="col-12 md:col-12">
-                                    <app-patrymony-crud
-                                    (totalPatrimoniesChanged)="onTotalPatrymoniesChanged($event)"
-                                        (patrimoniesChanged)="onPatrymoniesChanged($event)"
-                                        [categorias]="categorias"
-                                        [user_id]="user_id"
-                                        [periodSearch]="periodSearch"
-                                    >
-
-                                    </app-patrymony-crud>
                                 </div>
-                            </p-tabPanel>
+                            </div>
 
-                        </p-tabView>
-                </div>
+                        </p-tabPanel>
 
-            </p-fieldset>
-        </div>
+                    </p-tabView>
 
-
-
-        <form [formGroup]="planForm">
+                </p-fieldset>
+            </div>
 
 
-        <p-sidebar
-            [(visible)]="visiblePeriodPlan"
-            [style]="{height:'580px'}"
-            position="top"
-            autoZIndex="true"
-            [closeOnEscape]="false"
-            [showCloseIcon]="false"
-            >
-            <header>
-              <h3 style="font-weight:normal">Qual será o período cadastrado?</h3>
-            </header>
-
-            <content>
-
-              <div class="grid p-fluid mt-3">
-                <div class="field col-12 md:col-4">
-                  <span class="p-float-label">
-                    <p-calendar inputId="dataInicio" formControlName="endDate"></p-calendar>
-                    <label for="calendar">Início</label>
-                  </span>
-                </div>
-                <div class="field col-12 md:col-4">
-                  <span class="p-float-label">
-                    <p-calendar inputId="dataFim" formControlName="startDate"></p-calendar>
-                    <label for="calendar">Término</label>
-                  </span>
-                </div>
-                <div class="field col-12 md:col-4">
-                  <span class="p-float-label">
-                    <input type="text" id="inputtext" pInputText id="namePlan" formControlName="namePlan">
-                    <label for="namePlan">Buscar Período (Ex.: Jan/2024)</label>
-                  </span>
-                </div>
-              </div>
-            </content>
-            <footer>
-
-                <button
-                [disabled]="!planForm.valid"
-                    pButton
-                    pRipple
-                    (click)="salvarPeriodo()"
-                    type="button"
-                    label="Buscar Período"
-                    icon="pi pi-search"
-                    >
-                </button>
-
-
-            </footer>
-          </p-sidebar>
-
-        </form>
 
     </div>
 
 
-<!-- {{ planForm.value | json }} <br>
-{{ entries | json }} <br>
-{{ outs| json }}
 
-Patrimonio <br>
-{{ patrymonies | json }}
 
-Datas:
-{{ periodSearch | json }} -->
+    <div class="grid mt-3" >
+        <!-- <div class="grid mt-3" > -->
+        <p-fieldset [legend]="plan.namePlan" [toggleable]="true" class="line-height-3 m-0">
+            <div class="grid">
+                <div class="col-12 md:col-6">
+                    <app-entries-crud
+                        (totalEntriesChanged)="onTotalEntriesChanged($event)"
+                        (entriesChanged)="onEntriesChanged($event)"
+                        [categorias]="categorias"
+                        [user_id]="user_id"
+                        [periodSearch]="periodSearch"
+                        >
+                    </app-entries-crud>
+
+                </div>
+
+                <div class="col-12 md:col-6">
+                    <app-outs-crud
+                        (totalOutsChanged)="onTotalOutsChanged($event)"
+                        (outsChanged)="onOutsChanged($event)"
+                        [categorias]="categorias"
+                        [user_id]="user_id"
+                        [periodSearch]="periodSearch"
+                        >
+                    </app-outs-crud>
+
+                </div>
+            </div>
+
+            <div class="grid">
+                    <p-tabView orientation="left">
+                        <p-tabPanel header="Investimentos" class="line-height-3 m-0">
+                            <div class="col-12 md:col-12">
+                                <app-investments-crud
+                                    (totalInvestmentsChanged)="onTotalInvestmentsChanged($event)"
+                                    (investmentsChanged)="onInvestmentsChanged($event)"
+                                    [categorias]="categorias"
+                                    [user_id]="user_id"
+                                    [periodSearch]="periodSearch"
+                                >
+
+                                </app-investments-crud>
+
+                            </div>
+
+
+                        </p-tabPanel>
+
+                        <p-tabPanel header="Meu patrimônio" class="line-height-3 m-0">
+                            <div class="col-12 md:col-12">
+                                <app-patrymony-crud
+                                (totalPatrimoniesChanged)="onTotalPatrymoniesChanged($event)"
+                                    (patrimoniesChanged)="onPatrymoniesChanged($event)"
+                                    [categorias]="categorias"
+                                    [user_id]="user_id"
+                                    [periodSearch]="periodSearch"
+                                >
+
+                                </app-patrymony-crud>
+                            </div>
+                        </p-tabPanel>
+
+                    </p-tabView>
+            </div>
+
+        </p-fieldset>
+    </div>
+
+
+
+    <form [formGroup]="planForm">
+
+
+    <p-sidebar
+        [(visible)]="visiblePeriodPlan"
+        [style]="{height:'580px'}"
+        position="top"
+        autoZIndex="true"
+        [closeOnEscape]="false"
+        [showCloseIcon]="false"
+        >
+        <header>
+          <h3 style="font-weight:normal">Qual será o período cadastrado?</h3>
+        </header>
+
+        <content>
+
+          <div class="grid p-fluid mt-3">
+            <div class="field col-12 md:col-4">
+              <span class="p-float-label">
+                <p-calendar inputId="dataInicio" formControlName="endDate"></p-calendar>
+                <label for="calendar">Início</label>
+              </span>
+            </div>
+            <div class="field col-12 md:col-4">
+              <span class="p-float-label">
+                <p-calendar inputId="dataFim" formControlName="startDate"></p-calendar>
+                <label for="calendar">Término</label>
+              </span>
+            </div>
+            <div class="field col-12 md:col-4">
+              <span class="p-float-label">
+                <input type="text" id="inputtext" pInputText id="namePlan" formControlName="namePlan">
+                <label for="namePlan">Buscar Período (Ex.: Jan/2024)</label>
+              </span>
+            </div>
+          </div>
+        </content>
+        <footer>
+
+            <button
+            [disabled]="!planForm.valid"
+                pButton
+                pRipple
+                (click)="salvarPeriodo()"
+                type="button"
+                label="Buscar Período"
+                icon="pi pi-search"
+                >
+            </button>
+
+
+        </footer>
+      </p-sidebar>
+
+    </form>
+
+</div>

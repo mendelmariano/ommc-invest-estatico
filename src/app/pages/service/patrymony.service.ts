@@ -23,6 +23,13 @@ export class PatrymonyService {
           .toPromise();
       }
 
+
+    getPatromoniesForMounth() {
+        return this.http.get<any>(`${this.apiUrl}patrimonies/forMonth`)
+        .toPromise();
+    }
+
+
       getPatromoniesForPeriod(periodSearch: PeriodSearch) {
         return this.http.post<PatrimonyResponse[]>(`${this.apiUrl}patrimonies/period`, {periodo: periodSearch})
           .pipe(
